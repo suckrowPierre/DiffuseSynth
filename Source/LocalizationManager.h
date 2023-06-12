@@ -18,6 +18,7 @@ class LocalizationManager {
 
 public:
     explicit LocalizationManager(const Language& initialLanguage);
+    LocalizationManager();
     ~LocalizationManager();
 
     void setLanguage(const Language& language);
@@ -28,8 +29,9 @@ public:
 private:
     Language language;
 
-    juce::String loadLanguageFile();
+    std::unordered_map<juce::String, juce::String> loadLanguageFile();
     juce::String currentLanguageFile;
+    std::unordered_map<juce::String, juce::String> localizedStrings; // New member for caching
 };
 
 
