@@ -39,7 +39,6 @@ std::unordered_map<juce::String, juce::String> LocalizationManager::loadLanguage
     std::string languageName = std::string(magic_enum::enum_name(language));
     juce::String resourceName = juce::String(languageName).toLowerCase() + "_json";
 
-    // Use BinaryData to access the file
     const char* resourceData = nullptr;
     int resourceSize = 0;
 
@@ -53,15 +52,24 @@ std::unordered_map<juce::String, juce::String> LocalizationManager::loadLanguage
 
     std::unordered_map<juce::String, juce::String> tempMap;
     if (jsonVar.isObject()) {
-        auto* json = jsonVar.getDynamicObject();
-        auto properties = json->getProperties();
-        for (auto& property : properties) {
-            tempMap[property.name.toString()] = property.value.toString();
-        }
+        flattenJSONObject(jsonVar.getDynamicObject(), tempMap, "");
     }
 
     return tempMap;
 }
+
+void LocalizationManager::flattenJSONObject(juce::DynamicObject* jsonObject, std::unordered_map<juce::String, juce::String>& map, juce::String currentKey) {
+    auto properties = jsonObject->getProperties();
+    for (auto& property : properties) {
+        juce::String newKey = currentKey.isEmpty() ? property.name.toString() : currentKey + "." + property.name.toString();
+        if (property.value.isObject()) {
+            flattenJSONObject(property.value.getDynamicObject(), map, newKey);
+        } else {
+            map[newKey] = property.value.toString();
+        }
+    }
+}
+
 
 
 

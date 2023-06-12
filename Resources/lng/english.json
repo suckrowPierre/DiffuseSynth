@@ -1,3 +1,9 @@
 {
-  "hello_world": "hello world"
+  "synth": {
+    "title": "DiffuseSynth",
+    "subtitle": "Ein Synthesizer basierend auf latenter Diffusion"
+  },
+  "about" : {
+    "author": "Pierre-Louis Suckrow"
+  }
 }

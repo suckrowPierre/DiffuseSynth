@@ -27,7 +27,7 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
-    juce::String testText = manager.getLocalizedString("hello_world");
+    juce::String testText = manager.getLocalizedString("synth.title");
     g.drawFittedText (testText, getLocalBounds(), juce::Justification::centred, 1);
 }
 

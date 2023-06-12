@@ -17,25 +17,32 @@ enum class Language {
 
 class LocalizationManager {
 public:
-    static LocalizationManager& getInstance();
+    static LocalizationManager &getInstance();
 
-    void setLanguage(const Language& language);
+    void setLanguage(const Language &language);
+
     Language getLanguage();
 
-    juce::String getLocalizedString(const juce::String& key);
+    juce::String getLocalizedString(const juce::String &key);
 
 private:
-    explicit LocalizationManager(const Language& initialLanguage = Language::English);
+    explicit LocalizationManager(const Language &initialLanguage = Language::English);
+
     ~LocalizationManager();
 
-    LocalizationManager(const LocalizationManager&) = delete;
-    LocalizationManager& operator=(const LocalizationManager&) = delete;
+    LocalizationManager(const LocalizationManager &) = delete;
+
+    LocalizationManager &operator=(const LocalizationManager &) = delete;
 
     Language language;
+
     std::unordered_map<juce::String, juce::String> loadLanguageFile();
+
     juce::String currentLanguageFile;
     std::unordered_map<juce::String, juce::String> localizedStrings;
+
+    void flattenJSONObject(juce::DynamicObject *jsonObject, std::unordered_map<juce::String, juce::String> &map,
+                           juce::String currentKey);
+
 };
-
-
 #endif //DIFFUSESYNTH_LOCALIZATIONMANAGER_H

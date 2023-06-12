@@ -1,3 +1,9 @@
 {
-  "hello_world": "Hallo welt"
+  "synth": {
+    "title": "DiffuseSynth",
+    "subtitle": "Ein Synt"
+  },
+  "about" : {
+    "author": "Pierre-Louis Suckrow"
+  }
 }
