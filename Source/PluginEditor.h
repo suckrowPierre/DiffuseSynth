@@ -14,7 +14,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    LocalizationManager localizationManager = LocalizationManager(Language::German);
+
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.

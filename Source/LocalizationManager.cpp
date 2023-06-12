@@ -6,12 +6,13 @@
 #include "magic_enum.hpp"
 #include "BinaryData.h" //Gets generated in the build process
 
+LocalizationManager& LocalizationManager::getInstance() {
+    static LocalizationManager instance;
+    return instance;
+}
 
 LocalizationManager::LocalizationManager(const Language& initialLanguage) {
     setLanguage(initialLanguage);
-}
-LocalizationManager::LocalizationManager() {
-    setLanguage(Language::English);
 }
 LocalizationManager::~LocalizationManager() {
 }

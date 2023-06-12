@@ -3,6 +3,9 @@
 #include "LocalizationManager.h"
 
 //==============================================================================
+auto& manager = LocalizationManager::getInstance();
+
+
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p)
     : AudioProcessorEditor (&p), processorRef (p)
 {
@@ -24,7 +27,7 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
-    juce::String testText = localizationManager.getLocalizedString("hello_world");
+    juce::String testText = manager.getLocalizedString("hello_world");
     g.drawFittedText (testText, getLocalBounds(), juce::Justification::centred, 1);
 }
 

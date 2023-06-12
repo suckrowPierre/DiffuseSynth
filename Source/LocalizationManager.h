@@ -3,6 +3,7 @@
 // Created by Pierre-Louis Suckrow on 12.06.23.
 //
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_core/juce_core.h>
 
 
 #ifndef DIFFUSESYNTH_LOCALIZATIONMANAGER_H
@@ -15,11 +16,8 @@ enum class Language {
 
 
 class LocalizationManager {
-
 public:
-    explicit LocalizationManager(const Language& initialLanguage);
-    LocalizationManager();
-    ~LocalizationManager();
+    static LocalizationManager& getInstance();
 
     void setLanguage(const Language& language);
     Language getLanguage();
@@ -27,11 +25,16 @@ public:
     juce::String getLocalizedString(const juce::String& key);
 
 private:
-    Language language;
+    explicit LocalizationManager(const Language& initialLanguage = Language::English);
+    ~LocalizationManager();
 
+    LocalizationManager(const LocalizationManager&) = delete;
+    LocalizationManager& operator=(const LocalizationManager&) = delete;
+
+    Language language;
     std::unordered_map<juce::String, juce::String> loadLanguageFile();
     juce::String currentLanguageFile;
-    std::unordered_map<juce::String, juce::String> localizedStrings; // New member for caching
+    std::unordered_map<juce::String, juce::String> localizedStrings;
 };
 
 
