@@ -120,26 +120,17 @@ target_compile_definitions(DiffuseSynth
 # linked automatically. If we'd generated a binary data target above, we would need to link to it
 # here too. This is a standard CMake command.
 
+juce_add_binary_data(DiffuseSynthBinaryData
+        SOURCES
+        Resources/lng/english.json
+        Resources/lng/german.json)
+
 target_link_libraries(DiffuseSynth
-    PRIVATE
-        # AudioPluginData           # If we'd created a binary data target, we'd link to it here
+        PRIVATE
+        DiffuseSynthBinaryData  # Binary data target
         juce::juce_audio_utils
         juce::juce_dsp
-    PUBLIC
+        PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
-
-# Set the source and destination paths of the language files
-set(LANGUAGE_FILES_SRC "${CMAKE_SOURCE_DIR}/Resources/lng")
-set(LANGUAGE_FILES_DEST "${CMAKE_BINARY_DIR}/DiffuseSynth_artefacts/Debug/Standalone/DiffuseSynth.app/Resources/lng")
-
-# Create the destination directory
-file(MAKE_DIRECTORY ${LANGUAGE_FILES_DEST})
-
-# Copy the language files
-file(GLOB LANGUAGE_FILES "${LANGUAGE_FILES_SRC}/*.json")
-foreach(FILE ${LANGUAGE_FILES})
- get_filename_component(FILENAME ${FILE} NAME)
- configure_file(${FILE} "${LANGUAGE_FILES_DEST}/${FILENAME}" COPYONLY)
-endforeach()

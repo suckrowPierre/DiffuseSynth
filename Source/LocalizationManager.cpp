@@ -4,6 +4,8 @@
 
 #include "LocalizationManager.h"
 #include "magic_enum.hpp"
+#include "BinaryData.h" //Gets generated in the build process
+
 
 LocalizationManager::LocalizationManager(const Language& initialLanguage) {
     setLanguage(initialLanguage);
@@ -34,13 +36,17 @@ juce::String LocalizationManager::getLocalizedString(const juce::String &key) {
 
 std::unordered_map<juce::String, juce::String> LocalizationManager::loadLanguageFile() {
     std::string languageName = std::string(magic_enum::enum_name(language));
-    juce::String fileName = juce::String(languageName).toLowerCase() + ".json";
-    juce::File languageFile = juce::File::getSpecialLocation(juce::File::currentApplicationFile)
-            .getChildFile ("Resources")
-            .getChildFile ("lng")
-            .getChildFile (fileName);
+    juce::String resourceName = juce::String(languageName).toLowerCase() + "_json";
 
-    juce::String fileContent = languageFile.loadFileAsString();
+    // Use BinaryData to access the file
+    const char* resourceData = nullptr;
+    int resourceSize = 0;
+
+    if (auto* resource = BinaryData::getNamedResource(resourceName.toRawUTF8(), resourceSize)) {
+        resourceData = resource;
+    }
+
+    juce::String fileContent = juce::String::fromUTF8(resourceData, resourceSize);
 
     auto jsonVar = juce::JSON::parse(fileContent);
 
