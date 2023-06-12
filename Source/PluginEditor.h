@@ -2,6 +2,7 @@
 
 #include "PluginProcessor.h"
 #include "LocalizationManager.h"
+#include "Components/Heading.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
@@ -24,4 +25,6 @@ private:
     int height = 600;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
+    int headingHeight = 100;
+    Heading heading = Heading(headingHeight);
 };

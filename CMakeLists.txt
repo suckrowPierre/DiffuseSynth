@@ -89,6 +89,7 @@ target_sources(DiffuseSynth
         Source/PluginEditor.cpp
         Source/PluginProcessor.cpp
         Source/LocalizationManager.cpp
+        Source/Components/Heading.cpp
         )
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
