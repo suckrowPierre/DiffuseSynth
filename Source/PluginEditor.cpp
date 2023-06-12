@@ -12,7 +12,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     juce::ignoreUnused (processorRef);
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (width, height);
+    setLookAndFeel(new juce::LookAndFeel_V2);
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
