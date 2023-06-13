@@ -3,7 +3,7 @@
 //
 
 #include "LocalizationManager.h"
-#include "magic_enum.hpp"
+#include "../lib/magic_enum.hpp"
 #include "BinaryData.h" //Gets generated in the build process
 
 LocalizationManager& LocalizationManager::getInstance() {
