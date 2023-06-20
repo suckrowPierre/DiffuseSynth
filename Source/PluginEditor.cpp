@@ -6,15 +6,19 @@ LocalizationManager* _manager = &LocalizationManager::getInstance();
 
 
 
+
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p)
     : AudioProcessorEditor (&p), processorRef (p)
 {
+
     juce::ignoreUnused (processorRef);
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (width, height);
-    setLookAndFeel(new juce::LookAndFeel_V2);
+    setLookAndFeel(new juce::LookAndFeel_V1);
     addAndMakeVisible(heading);
+    _manager->setLanguage(Language::English);
+
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()

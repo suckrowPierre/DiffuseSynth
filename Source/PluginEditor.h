@@ -21,8 +21,8 @@ private:
     // access the processor object that created it.
     AudioPluginAudioProcessor& processorRef;
 
-    int width = 800;
-    int height = 600;
+    int width = 1200;
+    int height = 800;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
     int headingHeight = 100;
