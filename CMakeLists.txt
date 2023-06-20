@@ -21,6 +21,23 @@ project(DiffuseSynth VERSION 0.0.1)
 # included JUCE directly in your source tree (perhaps as a submodule), you'll need to tell CMake to
 # include that subdirectory as part of the build.
 
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "iOS")
+ set(CMAKE_OSX_DEPLOYMENT_TARGET 11.0 CACHE STRING "Minimum OS X deployment version" FORCE)
+
+ #code signing to run on an iOS device:
+ #    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer" CACHE STRING "" FORCE)
+ #    set(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "XXXXXXXXXX" CACHE STRING "" FORCE)
+else()
+ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version" FORCE)
+endif()
+
+option(UniversalBinary "Build universal binary for mac" ON)
+
+if (UniversalBinary)
+ set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE INTERNAL "")
+endif()
+
 # find_package(JUCE CONFIG REQUIRED)        # If you've installed JUCE to your system
 # or
  add_subdirectory("/Users/pierre_suckrow/Documents/BachelorJuce/JUCE" JUCE)                    # If you've put JUCE in a subdirectory called JUCE
@@ -37,13 +54,13 @@ project(DiffuseSynth VERSION 0.0.1)
 # the formats specified by the FORMATS arguments. This function accepts many optional arguments.
 # Check the readme at `docs/CMake API.md` in the JUCE repo for the full list.
 
-juce_add_plugin(AudioPluginExample
+juce_add_plugin(DiffuseSynth
     # VERSION ...                               # Set this if the plugin version is different to the project version
     # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     # ICON_SMALL ...
     # COMPANY_NAME ...                          # Specify the name of the plugin's author
-    # IS_SYNTH TRUE/FALSE                       # Is this a synth or an effect?
-    # NEEDS_MIDI_INPUT TRUE/FALSE               # Does the plugin need midi input?
+    IS_SYNTH TRUE                       # Is this a synth or an effect?
+    NEEDS_MIDI_INPUT TRUE               # Does the plugin need midi input?
     # NEEDS_MIDI_OUTPUT TRUE/FALSE              # Does the plugin need midi output?
     # IS_MIDI_EFFECT TRUE/FALSE                 # Is this plugin a MIDI effect?
     # EDITOR_WANTS_KEYBOARD_FOCUS TRUE/FALSE    # Does the editor need keyboard focus?
@@ -67,10 +84,13 @@ juce_add_plugin(AudioPluginExample
 # Finally, we supply a list of source files that will be built into the target. This is a standard
 # CMake command.
 
-target_sources(AudioPluginExample
+target_sources(DiffuseSynth
     PRIVATE
-        PluginEditor.cpp
-        PluginProcessor.cpp)
+        Source/PluginEditor.cpp
+        Source/PluginProcessor.cpp
+        Source/LocalizationManager.cpp
+        Source/Components/Heading.cpp
+        )
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use
@@ -79,7 +99,7 @@ target_sources(AudioPluginExample
 # definitions will be visible both to your code, and also the JUCE module code, so for new
 # definitions, pick unique names that are unlikely to collide! This is a standard CMake command.
 
-target_compile_definitions(AudioPluginExample
+target_compile_definitions(DiffuseSynth
     PUBLIC
         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
         JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
@@ -101,11 +121,17 @@ target_compile_definitions(AudioPluginExample
 # linked automatically. If we'd generated a binary data target above, we would need to link to it
 # here too. This is a standard CMake command.
 
-target_link_libraries(AudioPluginExample
-    PRIVATE
-        # AudioPluginData           # If we'd created a binary data target, we'd link to it here
+juce_add_binary_data(DiffuseSynthBinaryData
+        SOURCES
+        Resources/lng/english.json
+        Resources/lng/german.json)
+
+target_link_libraries(DiffuseSynth
+        PRIVATE
+        DiffuseSynthBinaryData  # Binary data target
         juce::juce_audio_utils
-    PUBLIC
+        juce::juce_dsp
+        PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
