@@ -1,9 +1,11 @@
 #include "PluginProcessor.h"
-#include "PluginEditor.h"
+
+
+//LocalizationManager* _manager = &LocalizationManager::getInstance();
 
 //==============================================================================
 AudioPluginAudioProcessor::AudioPluginAudioProcessor()
-        : AudioProcessor (BusesProperties()
+        : MagicProcessor (BusesProperties()
 #if ! JucePlugin_IsMidiEffect
 #if ! JucePlugin_IsSynth
                                   .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
@@ -12,6 +14,11 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 #endif
 )
 {
+    myTextValue.setValue("Hello, Worldo!"); // set initial text
+
+    // register "myText" property with the magicState
+    magicState.getPropertyAsValue("myString").setValue("Your text here");
+
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
@@ -151,33 +158,6 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         juce::ignoreUnused (channelData);
         // ..do something to the data...
     }
-}
-
-//==============================================================================
-bool AudioPluginAudioProcessor::hasEditor() const
-{
-    return true; // (change this to false if you choose to not supply an editor)
-}
-
-juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor()
-{
-    return new AudioPluginAudioProcessorEditor (*this);
-}
-
-//==============================================================================
-void AudioPluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
-{
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused (destData);
-}
-
-void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
-{
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    juce::ignoreUnused (data, sizeInBytes);
 }
 
 //==============================================================================
