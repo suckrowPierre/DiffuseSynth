@@ -14,11 +14,11 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 #endif
 )
 {
-    myTextValue.setValue("Hello, Worldo!"); // set initial text
+    juce::Value myText;
+    myText = juce::Value("Hello World");
+    myText.referTo(magicState.getPropertyAsValue("Labels:Value"));
 
-    // register "myText" property with the magicState
-    magicState.getPropertyAsValue("myString").setValue("Your text here");
-
+    foleys::AtomicValueAttachment *myTextAttachment = new foleys::AtomicValueAttachment(magicState, "Labels:Value", myText);
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
