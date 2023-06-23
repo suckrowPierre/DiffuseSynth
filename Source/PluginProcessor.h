@@ -40,6 +40,7 @@ public:
 
 private:
     //==============================================================================
-    juce::Value myTextValue;
+
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };

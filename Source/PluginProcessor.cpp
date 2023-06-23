@@ -14,15 +14,12 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 #endif
 )
 {
-    juce::Value myText;
-    myText = juce::Value("Hello World");
-    myText.referTo(magicState.getPropertyAsValue("Labels:Value"));
+    magicState.addTrigger("generate", [&] { std::cout << "generate" << std::endl;
+    });
 
-    foleys::AtomicValueAttachment *myTextAttachment = new foleys::AtomicValueAttachment(magicState, "Labels:Value", myText);
 }
 
-AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
-{
+AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
 }
 
 //==============================================================================
