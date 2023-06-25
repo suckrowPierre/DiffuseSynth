@@ -15,20 +15,20 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 )
 {
     promptValue.referTo (magicState.getPropertyAsValue ("prompt"));
-
     magicState.addTrigger("generate", [&] {
-        std::cout << "generate" << std::endl;
-        auto labelContent = magicState.getPropertyAsValue("prompt").toString();
-        std::cout << "Label content: " << labelContent << std::endl;
+        generateSampleFromPrompt(magicState.getPropertyAsValue("prompt").toString());
     });
-
-
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
 }
 
 //==============================================================================
+ void:: AudioPluginAudioProcessor::generateSampleFromPrompt(juce:: String prompt) {
+    //TODO: Implement ONNX Runtime of AudioLDM
+    std::cout << "Prompt: " << prompt << std::endl;
+}
+
 const juce::String AudioPluginAudioProcessor::getName() const
 {
     return JucePlugin_Name;

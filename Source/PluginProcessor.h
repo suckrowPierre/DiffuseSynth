@@ -40,6 +40,7 @@ public:
 
 private:
     //==============================================================================
+    static void generateSampleFromPrompt(juce:: String prompt);
     juce::Label editableLabel;
     juce::String initialPromptFieldMessage = "Prompt Me";
     juce::Value  promptValue { initialPromptFieldMessage};
