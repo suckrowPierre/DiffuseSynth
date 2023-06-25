@@ -14,8 +14,14 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 #endif
 )
 {
-    magicState.addTrigger("generate", [&] { std::cout << "generate" << std::endl;
+    promptValue.referTo (magicState.getPropertyAsValue ("prompt"));
+
+    magicState.addTrigger("generate", [&] {
+        std::cout << "generate" << std::endl;
+        auto labelContent = magicState.getPropertyAsValue("prompt").toString();
+        std::cout << "Label content: " << labelContent << std::endl;
     });
+
 
 }
 
@@ -93,6 +99,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     juce::ignoreUnused (sampleRate, samplesPerBlock);
+    magicState.getPropertyAsValue ("prompt").setValue(initialPromptFieldMessage);
 }
 
 void AudioPluginAudioProcessor::releaseResources()

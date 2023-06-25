@@ -40,6 +40,9 @@ public:
 
 private:
     //==============================================================================
+    juce::Label editableLabel;
+    juce::String initialPromptFieldMessage = "Prompt Me";
+    juce::Value  promptValue { initialPromptFieldMessage};
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
