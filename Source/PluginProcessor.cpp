@@ -1,4 +1,5 @@
 #include "PluginProcessor.h"
+#include "BinaryData.h"
 
 
 //LocalizationManager* _manager = &LocalizationManager::getInstance();
@@ -14,6 +15,8 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 #endif
 )
 {
+    FOLEYS_SET_SOURCE_PATH(__FILE__);
+    magicState.setGuiValueTree (BinaryData::magic_xml, BinaryData::magic_xmlSize);
     promptValue.referTo (magicState.getPropertyAsValue ("prompt"));
     magicState.addTrigger("generate", [&] {
         generateSampleFromPrompt(magicState.getPropertyAsValue("prompt").toString());
@@ -24,6 +27,7 @@ AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
 }
 
 //==============================================================================
+
  void:: AudioPluginAudioProcessor::generateSampleFromPrompt(juce:: String prompt) {
     //TODO: Implement ONNX Runtime of AudioLDM
     std::cout << "Prompt: " << prompt << std::endl;
