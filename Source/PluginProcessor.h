@@ -1,9 +1,10 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include "../Modules/foleys_gui_magic/foleys_gui_magic.h"
 
 //==============================================================================
-class AudioPluginAudioProcessor  : public juce::AudioProcessor
+class AudioPluginAudioProcessor  : public foleys::MagicProcessor
 {
 public:
     //==============================================================================
@@ -19,9 +20,6 @@ public:
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
     using AudioProcessor::processBlock;
 
-    //==============================================================================
-    juce::AudioProcessorEditor* createEditor() override;
-    bool hasEditor() const override;
 
     //==============================================================================
     const juce::String getName() const override;
@@ -39,10 +37,14 @@ public:
     void changeProgramName (int index, const juce::String& newName) override;
 
     //==============================================================================
-    void getStateInformation (juce::MemoryBlock& destData) override;
-    void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
     //==============================================================================
+    static void generateSampleFromPrompt(juce:: String prompt);
+    juce::Label editableLabel;
+    juce::String initialPromptFieldMessage = "Prompt Me";
+    juce::Value  promptValue { initialPromptFieldMessage};
+
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };

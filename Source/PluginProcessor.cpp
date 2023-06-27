@@ -1,9 +1,12 @@
 #include "PluginProcessor.h"
-#include "PluginEditor.h"
+#include "BinaryData.h"
+
+
+//LocalizationManager* _manager = &LocalizationManager::getInstance();
 
 //==============================================================================
 AudioPluginAudioProcessor::AudioPluginAudioProcessor()
-        : AudioProcessor (BusesProperties()
+        : MagicProcessor (BusesProperties()
 #if ! JucePlugin_IsMidiEffect
 #if ! JucePlugin_IsSynth
                                   .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
@@ -12,13 +15,24 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 #endif
 )
 {
+    FOLEYS_SET_SOURCE_PATH(__FILE__);
+    magicState.setGuiValueTree (BinaryData::magic_xml, BinaryData::magic_xmlSize);
+    promptValue.referTo (magicState.getPropertyAsValue ("prompt"));
+    magicState.addTrigger("generate", [&] {
+        generateSampleFromPrompt(magicState.getPropertyAsValue("prompt").toString());
+    });
 }
 
-AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
-{
+AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
 }
 
 //==============================================================================
+
+ void:: AudioPluginAudioProcessor::generateSampleFromPrompt(juce:: String prompt) {
+    //TODO: Implement ONNX Runtime of AudioLDM
+    std::cout << "Prompt: " << prompt << std::endl;
+}
+
 const juce::String AudioPluginAudioProcessor::getName() const
 {
     return JucePlugin_Name;
@@ -89,6 +103,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     juce::ignoreUnused (sampleRate, samplesPerBlock);
+    magicState.getPropertyAsValue ("prompt").setValue(initialPromptFieldMessage);
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -151,33 +166,6 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         juce::ignoreUnused (channelData);
         // ..do something to the data...
     }
-}
-
-//==============================================================================
-bool AudioPluginAudioProcessor::hasEditor() const
-{
-    return true; // (change this to false if you choose to not supply an editor)
-}
-
-juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor()
-{
-    return new AudioPluginAudioProcessorEditor (*this);
-}
-
-//==============================================================================
-void AudioPluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
-{
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused (destData);
-}
-
-void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
-{
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    juce::ignoreUnused (data, sizeInBytes);
 }
 
 //==============================================================================
