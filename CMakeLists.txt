@@ -40,7 +40,7 @@ endif()
 
 # find_package(JUCE CONFIG REQUIRED)        # If you've installed JUCE to your system
 # or
- add_subdirectory("/Users/pierre_suckrow/Documents/BachelorJuce/JUCE" JUCE)
+ add_subdirectory(JUCE JUCE)
 
 add_subdirectory(Modules)
 
