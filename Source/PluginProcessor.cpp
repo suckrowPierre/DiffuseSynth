@@ -13,13 +13,17 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 #endif
                                   .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
 #endif
-)
+),
+          apiClient(std::make_unique<AudioLDMApiClient>())
 {
     FOLEYS_SET_SOURCE_PATH(__FILE__);
-    magicState.setGuiValueTree (BinaryData::magic_xml, BinaryData::magic_xmlSize);
-    promptValue.referTo (magicState.getPropertyAsValue ("prompt"));
+    setupModel("mps", "audioldm-l-full");
+    magicState.setGuiValueTree(BinaryData::magic_xml, BinaryData::magic_xmlSize);
+    promptValue.referTo(magicState.getPropertyAsValue("prompt"));
+    negativePromptValue.referTo(magicState.getPropertyAsValue("negative_prompt"));
+
     magicState.addTrigger("generate", [&] {
-        generateSampleFromPrompt(magicState.getPropertyAsValue("prompt").toString());
+        generateSampleFromPrompt(magicState.getPropertyAsValue("prompt").toString(), magicState.getPropertyAsValue("negative_prompt").toString());
     });
 }
 
@@ -28,9 +32,41 @@ AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
 
 //==============================================================================
 
- void:: AudioPluginAudioProcessor::generateSampleFromPrompt(juce:: String prompt) {
-    //TODO: Implement ONNX Runtime of AudioLDM
+void:: AudioPluginAudioProcessor::generateSampleFromPrompt(const juce::String& prompt, const juce::String& negative_prompt) {
     std::cout << "Prompt: " << prompt << std::endl;
+    std::cout << "Negative Prompt: " << negative_prompt << std::endl;
+    if(apiClient) {
+        GenerateSampleParameters params;
+        params.prompt = prompt;
+        params.negative_prompt = negative_prompt;
+        try {
+            if (apiClient->generateSample(params)){
+                juce::Logger::writeToLog("Sample generated");
+            }
+
+        } catch (const std::exception& e) {
+            juce::Logger::writeToLog("Failed to generate sample. Exception: " + juce::String(e.what()));
+        }
+    }
+}
+
+void:: AudioPluginAudioProcessor::setupModel(juce::String device, juce::String repo_id) {
+    if (apiClient) {
+        SetupModelParameters params;
+        params.device = device;
+        params.repo_id = repo_id;
+
+        apiClient->setApiPort("8000");
+        try {
+            if (apiClient->setupModel(params)){
+                juce::Logger::writeToLog("successfully set up model");
+            }
+        } catch (const std::exception& e) {
+            juce::Logger::writeToLog("Failed to set up model. Exception: " + juce::String(e.what()));
+        }
+    } else {
+        juce::Logger::writeToLog("Failed to set up model. AudioLDMApiClient not initialized.");
+    }
 }
 
 const juce::String AudioPluginAudioProcessor::getName() const
@@ -104,6 +140,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     // initialisation that you need..
     juce::ignoreUnused (sampleRate, samplesPerBlock);
     magicState.getPropertyAsValue ("prompt").setValue(initialPromptFieldMessage);
+    magicState.getPropertyAsValue ("negative_prompt").setValue(initialNegativePromptFieldMessage);
 }
 
 void AudioPluginAudioProcessor::releaseResources()

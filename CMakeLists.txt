@@ -93,6 +93,7 @@ target_sources(DiffuseSynth
     PRIVATE
         Source/PluginProcessor.cpp
         Source/LocalizationManager.cpp
+        Source/AudioLDMApiClient.cpp
         Modules/foleys_gui_magic/foleys_gui_magic.cpp
         )
 
@@ -136,6 +137,7 @@ target_link_libraries(DiffuseSynth
         PRIVATE
         DiffuseSynthBinaryData  # Binary data target
         juce::juce_audio_utils
+        juce::juce_core
         juce::juce_dsp
         juce::juce_cryptography
         PUBLIC

@@ -2,6 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "../Modules/foleys_gui_magic/foleys_gui_magic.h"
+#include "AudioLDMApiClient.h"
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public foleys::MagicProcessor
@@ -40,10 +41,16 @@ public:
 
 private:
     //==============================================================================
-    static void generateSampleFromPrompt(juce:: String prompt);
+    void generateSampleFromPrompt(const juce::String& prompt, const juce::String& negative_prompt); // Added const
+    void setupModel(juce::String device, juce::String repo_id);
+    std::unique_ptr<AudioLDMApiClient> apiClient;
+
     juce::Label editableLabel;
+    juce::Label negativePromptLabel;
     juce::String initialPromptFieldMessage = "Prompt Me";
-    juce::Value  promptValue { initialPromptFieldMessage};
+    juce::String initialNegativePromptFieldMessage = "low quality, average quality, noise, high pitch, artefacts";
+    juce::Value promptValue { initialPromptFieldMessage};
+    juce::Value negativePromptValue {initialNegativePromptFieldMessage};
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
