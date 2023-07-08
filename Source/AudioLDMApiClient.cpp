@@ -44,6 +44,48 @@ bool AudioLDMApiClient::generateSample(const GenerateSampleParameters& params) {
     decodeAudio(base64AudioData);
     return true;
 }
+
+bool AudioLDMApiClient::isApiAvailable() const{
+    juce::URL url = constructApiUrl("/");
+    sendGetRequest(url);
+    return true;
+}
+
+
+juce::var AudioLDMApiClient::getSetupParameters() const{
+    juce::URL url = constructApiUrl(setupParametersEndpointPath);
+    juce::var response = sendGetRequest(url);
+
+    if (!response.isObject()){
+        throw std::runtime_error("Response is not a JSON object");
+    }
+
+    juce::var devicesVar = response.getProperty("devices", juce::var());
+    juce::var modelsVar = response.getProperty("models", juce::var());
+
+
+    if (!devicesVar.isArray() || !modelsVar.isArray()){
+        throw std::runtime_error("Expected 'devices' and 'models' to be arrays in the response");
+    }
+
+    juce::Array<juce::var> devices = *devicesVar.getArray();
+    juce::Array<juce::var> models = *modelsVar.getArray();
+
+
+    juce::var result = juce::var(new juce::DynamicObject());
+    result.getDynamicObject()->setProperty("devices", devices);
+    result.getDynamicObject()->setProperty("models", models);
+
+    return result;
+}
+
+bool AudioLDMApiClient::isModelSetUp() const {
+    juce::URL url = constructApiUrl(modelStatusEndpointPath);
+    juce::var response = sendGetRequest(url);
+    return static_cast<bool>(response["isModelSetup"]);
+}
+
+
 /**
  * Extracts the audio data from the response of an API call.
  * @param body The body of the API call.
@@ -66,6 +108,18 @@ juce::String AudioLDMApiClient::extractAudioDataFromResponse(const juce::String 
 juce::var AudioLDMApiClient::sendPostRequest(const juce::URL& url, const juce::String& body) {
     juce::WebInputStream stream(url.withPOSTData(body), true);
     stream.withExtraHeaders("Content-Type: application/json");
+
+    if(!stream.connect(nullptr)) {
+        throw std::runtime_error("Failed to connect to API");
+    }
+
+    return handleApiResponse(stream);
+}
+
+
+juce::var AudioLDMApiClient::sendGetRequest(const juce::URL& url) {
+    juce::WebInputStream stream(url, true);
+    stream.withCustomRequestCommand("GET");
 
     if(!stream.connect(nullptr)) {
         throw std::runtime_error("Failed to connect to API");

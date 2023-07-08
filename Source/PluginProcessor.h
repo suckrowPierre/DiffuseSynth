@@ -41,6 +41,7 @@ public:
 
 private:
     //==============================================================================
+    void connectToApi();
     void generateSampleFromPrompt(const juce::String& prompt, const juce::String& negative_prompt); // Added const
     void setupModel(juce::String device, juce::String repo_id);
     std::unique_ptr<AudioLDMApiClient> apiClient;
@@ -54,4 +55,6 @@ private:
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
+
+    static void extractDeviceAndModelParameters(const juce::var &devicesAndModels) ;
 };

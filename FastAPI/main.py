@@ -83,11 +83,21 @@ audio_model = None
 @app.get("/")
 async def root():
     return {
-        "devices": get_devices_names(),
-        "models": get_models_names(),
+        "message": "alive"
+    }
+
+@app.get("/model-status")
+async def get_model_status():
+    return {
         "isModelSetup": audio_model is not None
     }
 
+@app.get("/setup_parameters")
+async def get_setup_parameters():
+    return {
+        "devices": get_devices_names(),
+        "models": get_models_names(),
+    }
 
 @app.post("/setup")
 async def setup(params: SetupParams):
