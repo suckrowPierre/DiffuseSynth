@@ -42,16 +42,34 @@ public:
 private:
     //==============================================================================
     void connectToApi();
-    void generateSampleFromPrompt(const juce::String& prompt, const juce::String& negative_prompt); // Added const
+    void generateSampleFromPrompt();
     void setupModel(juce::String device, juce::String repo_id);
     std::unique_ptr<AudioLDMApiClient> apiClient;
+    bool checkApiStatus();
+    bool checkModelStatus();
+    void refresh();
 
-    juce::Label editableLabel;
-    juce::Label negativePromptLabel;
+
+    void updateGUIStatus(const juce::String& id, const juce::String& colour);
+
+
     juce::String initialPromptFieldMessage = "Prompt Me";
     juce::String initialNegativePromptFieldMessage = "low quality, average quality, noise, high pitch, artefacts";
     juce::Value promptValue { initialPromptFieldMessage};
     juce::Value negativePromptValue {initialNegativePromptFieldMessage};
+
+    float initialAudioLength = 5.12f;
+    juce::Value audioLengthValue { initialAudioLength };
+    float initialNumInference = 10.0f;
+    juce::Value numInferenceValue { initialNumInference };
+    float initialGuidanceScale = 2.5f;
+    juce::Value guidanceScaleValue { initialGuidanceScale };
+
+    juce::String red = "FFFF0000";
+    juce::String green = "FF06FF00";
+    juce::String GUIServerStatusId = "server_status";
+    juce::String GUIModelStatusId = "model_status";
+
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)

@@ -44,9 +44,9 @@ def is_device_valid(device):
 class GenerateParams(BaseModel):
     prompt: str
     negative_prompt: str
-    audio_length_in_s: float = 5.0
-    num_inference_steps: int = 10
-    guidance_scale: float = 2.5
+    audio_length_in_s: float
+    num_inference_steps: float
+    guidance_scale: float
 
 
 class SetupParams(BaseModel):
@@ -72,7 +72,7 @@ class AudioModel:
     def generate(self, params: GenerateParams):
         return self.pipe(prompt=params.prompt,
                          audio_length_in_s=params.audio_length_in_s,
-                         num_inference_steps=params.num_inference_steps,
+                         num_inference_steps=10,
                          guidance_scale=params.guidance_scale,
                          negative_prompt=params.negative_prompt).audios[0]
 

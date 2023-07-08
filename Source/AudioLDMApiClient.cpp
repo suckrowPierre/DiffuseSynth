@@ -9,6 +9,8 @@
 
 #include "AudioLDMApiClient.h"
 #include <stdexcept>
+#include <string>
+
 
 /**
  * Sets up the model using the specified parameters.
@@ -39,6 +41,7 @@ bool AudioLDMApiClient::generateSample(const GenerateSampleParameters& params) {
     }
 
     juce::String body = getGenerateSampleBody(params);
+    std::cout << body << std::endl;
     juce::URL url = constructApiUrl(generateSampleEndpointPath);
     juce::String base64AudioData = extractAudioDataFromResponse(body, url);
     decodeAudio(base64AudioData);
@@ -47,7 +50,11 @@ bool AudioLDMApiClient::generateSample(const GenerateSampleParameters& params) {
 
 bool AudioLDMApiClient::isApiAvailable() const{
     juce::URL url = constructApiUrl("/");
-    sendGetRequest(url);
+    try {
+        sendGetRequest(url);
+    } catch (const std::exception& e) {
+        return false;
+    }
     return true;
 }
 
@@ -228,6 +235,6 @@ juce::String AudioLDMApiClient::getSetupBody(const SetupModelParameters& params)
  * @return The request body as a JSON string.
  */
 juce::String AudioLDMApiClient::getGenerateSampleBody(const GenerateSampleParameters& params) {
-    juce::String body = R"({ "prompt": ")" + params.prompt + R"(", "negative_prompt": ")" + params.negative_prompt + "\" }";
+    juce::String body = R"({ "prompt": ")" + params.prompt + R"(", "negative_prompt": ")" + params.negative_prompt + R"(", "audio_length_in_s": ")" + std::to_string(params.audio_length_in_s) + R"(", "num_inference_steps": ")" + std::to_string(params.num_inference_steps) + + R"(", "guidance_scale": ")" + std::to_string(params.guidance_scale) + "\" }";
     return body;
 }

@@ -107,7 +107,7 @@ target_sources(DiffuseSynth
 target_compile_definitions(DiffuseSynth
     PUBLIC
         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
-        FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
+        # FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
         JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
         JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
         JUCE_VST3_CAN_REPLACE_VST2=0)

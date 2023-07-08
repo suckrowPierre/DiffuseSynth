@@ -19,11 +19,20 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     connectToApi();
     FOLEYS_SET_SOURCE_PATH(__FILE__);
     magicState.setGuiValueTree(BinaryData::magic_xml, BinaryData::magic_xmlSize);
+
     promptValue.referTo(magicState.getPropertyAsValue("prompt"));
     negativePromptValue.referTo(magicState.getPropertyAsValue("negative_prompt"));
+    audioLengthValue.referTo(magicState.getPropertyAsValue("audio_length_in_s"));
+    numInferenceValue.referTo(magicState.getPropertyAsValue("num_inference_steps"));
+    guidanceScaleValue.referTo(magicState.getPropertyAsValue("guidance_scale"));
+
 
     magicState.addTrigger("generate", [&] {
-        generateSampleFromPrompt(magicState.getPropertyAsValue("prompt").toString(), magicState.getPropertyAsValue("negative_prompt").toString());
+        generateSampleFromPrompt();
+    });
+
+    magicState.addTrigger("refresh", [&] {
+        refresh();
     });
 }
 
@@ -36,17 +45,11 @@ void:: AudioPluginAudioProcessor::connectToApi() {
     if (apiClient) {
         apiClient->setApiPort("8000");
         try {
-            if (apiClient->isApiAvailable()) {
-                juce::Logger::writeToLog("Connected to API");
+            if (checkApiStatus()) {
                 juce::var devicesAndModels = apiClient->getSetupParameters();
-
                 extractDeviceAndModelParameters(devicesAndModels);
 
-                bool isModelSetup = apiClient->isModelSetUp();
-                std::cout << "Is model setup: " << isModelSetup << std::endl;
-
-                if (!isModelSetup) {
-                    juce::Logger::writeToLog("Model not setup");
+                if (!checkModelStatus()) {
                     SetupModelParameters params;
                     //TODO: get device and repo_id from saved state
                     params.device = "mps";
@@ -70,6 +73,39 @@ void:: AudioPluginAudioProcessor::connectToApi() {
     }
 }
 
+void ::AudioPluginAudioProcessor::refresh() {
+    checkApiStatus();
+    checkModelStatus();
+}
+
+bool ::AudioPluginAudioProcessor::checkModelStatus(){
+    bool isAvailable = apiClient->isModelSetUp();
+    if (!isAvailable) {
+        juce::Logger::writeToLog("Model is not available");
+        updateGUIStatus(GUIModelStatusId,red);
+        return false;
+    }
+    juce::Logger::writeToLog("Model is available");
+    updateGUIStatus(GUIModelStatusId, green);
+    return true;
+}
+
+bool ::AudioPluginAudioProcessor::checkApiStatus(){
+    bool isAvailable = apiClient->isApiAvailable();
+    if (!isAvailable) {
+        juce::Logger::writeToLog("API is not available");
+        updateGUIStatus(GUIServerStatusId,red);
+        return false;
+    }
+    juce::Logger::writeToLog("API is available");
+    updateGUIStatus(GUIServerStatusId, green);
+    return true;
+}
+
+void ::AudioPluginAudioProcessor::updateGUIStatus(const juce::String& id, const juce::String& colour){
+    //TODO: update the text colour of the label with the id "server_connection"
+}
+
 void ::AudioPluginAudioProcessor::extractDeviceAndModelParameters(const juce::var &devicesAndModels) {
     juce::Array<juce::var> devices = *devicesAndModels.getProperty("devices", juce::var()).getArray();
     juce::Array<juce::var> models = *devicesAndModels.getProperty("models", juce::var()).getArray();
@@ -86,13 +122,20 @@ void ::AudioPluginAudioProcessor::extractDeviceAndModelParameters(const juce::va
     //TODO write devies and models to GUI
 }
 
-void:: AudioPluginAudioProcessor::generateSampleFromPrompt(const juce::String& prompt, const juce::String& negative_prompt) {
-    std::cout << "Prompt: " << prompt << std::endl;
-    std::cout << "Negative Prompt: " << negative_prompt << std::endl;
+void:: AudioPluginAudioProcessor::generateSampleFromPrompt() {
+
     if(apiClient) {
+
         GenerateSampleParameters params;
-        params.prompt = prompt;
-        params.negative_prompt = negative_prompt;
+        params.prompt = magicState.getPropertyAsValue("prompt").toString();
+        params.negative_prompt = magicState.getPropertyAsValue("negative_prompt").toString();
+        params.audio_length_in_s = magicState.getPropertyAsValue("audio_length_in_s").getValue();
+        params.num_inference_steps = magicState.getPropertyAsValue("num_inference_steps").getValue();
+        params.guidance_scale = magicState.getPropertyAsValue("guidance_scale").getValue();
+
+
+        juce::Logger::writeToLog("Generating sample with parameters: " + params.prompt + ", " + params.negative_prompt + ", " + juce::String(params.audio_length_in_s) + ", " + juce::String(params.num_inference_steps) + ", " + juce::String(params.guidance_scale));
+
         try {
             if (apiClient->generateSample(params)){
                 juce::Logger::writeToLog("Sample generated");
@@ -197,6 +240,10 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     juce::ignoreUnused (sampleRate, samplesPerBlock);
     magicState.getPropertyAsValue ("prompt").setValue(initialPromptFieldMessage);
     magicState.getPropertyAsValue ("negative_prompt").setValue(initialNegativePromptFieldMessage);
+    magicState.getPropertyAsValue("audio_length_in_s").setValue(initialAudioLength);
+    magicState.getPropertyAsValue("num_inference_steps").setValue(initialNumInference);
+    magicState.getPropertyAsValue("guidance_scale").setValue(initialGuidanceScale);
+
 }
 
 void AudioPluginAudioProcessor::releaseResources()

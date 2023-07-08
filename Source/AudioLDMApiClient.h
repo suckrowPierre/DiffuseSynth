@@ -22,6 +22,9 @@ class GenerateSampleParameters {
 public:
     juce::String prompt;
     juce::String negative_prompt;
+    float audio_length_in_s;
+    float num_inference_steps;
+    float guidance_scale;
 };
 
 class AudioLDMApiClient {
