@@ -110,11 +110,70 @@ bool ::AudioPluginAudioProcessor::checkApiStatus(){
     return true;
 }
 
+juce::ValueTree AudioPluginAudioProcessor::getNodeById(const juce::String& id)
+{
+    if(nodePaths.count(id) == 0) // If the path for this id is not stored
+    {
+        juce::Identifier identifier = juce::Identifier("id");
+        auto guiTree = magicState.getGuiTree().getChild(1);
+        nodePaths[id] = searchGUITreeRecursively(guiTree, identifier, id); // Store the path
+    }
+
+    return getNodeByPath(nodePaths[id]); // Retrieve the node by the stored path
+}
+
+std::vector<int> AudioPluginAudioProcessor::searchGUITreeRecursively(const juce::ValueTree& node, const juce::Identifier& identifier, const juce::String& id, std::vector<int> path)
+{
+    int numberChildren = node.getNumChildren();
+    for(int i = 0; i < numberChildren; i++)
+    {
+        auto child = node.getChild(i);
+        if(child.isValid() && child.hasProperty(identifier) && child.getProperty(identifier) == id)
+        {
+            path.push_back(i);
+            return path;
+        }
+        else
+        {
+            auto newPath = path;
+            newPath.push_back(i);
+            auto result = searchGUITreeRecursively(child, identifier, id, newPath);
+            if(!result.empty())
+            {
+                return result;
+            }
+        }
+    }
+
+    return {}; // Return an empty vector if no matching node was found
+}
+
+juce::ValueTree AudioPluginAudioProcessor::getNodeByPath(const std::vector<int>& path)
+{
+    auto node = magicState.getGuiTree().getChild(1); // Start from the initial node
+    for(auto index : path)
+    {
+        if(node.getNumChildren() > index)
+            node = node.getChild(index);
+        else
+            return {}; // Return an invalid ValueTree if the path does not exist
+    }
+
+    return node;
+}
+
+
+void ::AudioPluginAudioProcessor::setListBoxes(juce::Array<juce::var>& items){
+
+    //create a juce list box model from an array of strings and load it into the list box with the id "device_list"
+
+
+}
+
 void ::AudioPluginAudioProcessor::updateGUIStatus(const juce::String& id, const juce::String& colour){
 
-    auto gui = magicState.getGuiTree().getChild(1).getChild(0).getChild(1);
 
-    auto node = gui.getChildWithProperty(juce::Identifier("id"), id);
+    auto node = getNodeById(id);
 
     if (!node.isValid()) {
         juce::Logger::writeToLog("Failed to find node with id: " + id);

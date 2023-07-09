@@ -49,8 +49,14 @@ private:
     bool checkModelStatus();
     void refresh();
 
+    std::map<juce::String, std::vector<int>> nodePaths;
+    juce::ValueTree getNodeById(const juce::String& id);
+    juce::ValueTree getNodeByPath(const std::vector<int>& path);
+    std::vector<int> searchGUITreeRecursively(const juce::ValueTree& node, const juce::Identifier& identifier, const juce::String& id, std::vector<int> path = {});
+
 
     void updateGUIStatus(const juce::String& id, const juce::String& colour);
+    void setListBoxes(juce::Array<juce::var>& items);
 
 
     juce::String initialPromptFieldMessage = "Prompt Me";
