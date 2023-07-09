@@ -16,7 +16,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 ),
           apiClient(std::make_unique<AudioLDMApiClient>())
 {
-    connectToApi();
+
     FOLEYS_SET_SOURCE_PATH(__FILE__);
     magicState.setGuiValueTree(BinaryData::magic_xml, BinaryData::magic_xmlSize);
 
@@ -34,6 +34,8 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     magicState.addTrigger("refresh", [&] {
         refresh();
     });
+
+    connectToApi();
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
@@ -71,6 +73,7 @@ void:: AudioPluginAudioProcessor::connectToApi() {
     } else {
         juce::Logger::writeToLog("Failed to connect to API. AudioLDMApiClient not initialized.");
     }
+    refresh();
 }
 
 void ::AudioPluginAudioProcessor::refresh() {
@@ -79,15 +82,20 @@ void ::AudioPluginAudioProcessor::refresh() {
 }
 
 bool ::AudioPluginAudioProcessor::checkModelStatus(){
-    bool isAvailable = apiClient->isModelSetUp();
-    if (!isAvailable) {
-        juce::Logger::writeToLog("Model is not available");
-        updateGUIStatus(GUIModelStatusId,red);
-        return false;
+
+    try {
+        bool isAvailable = apiClient->isModelSetUp();
+        if (isAvailable) {
+            juce::Logger::writeToLog("Model is available");
+            updateGUIStatus(GUIModelStatusId, green);
+            return isAvailable;
+        }
     }
-    juce::Logger::writeToLog("Model is available");
-    updateGUIStatus(GUIModelStatusId, green);
-    return true;
+    catch (const std::exception& e) {
+    }
+    juce::Logger::writeToLog("Model is not available");
+    updateGUIStatus(GUIModelStatusId,red);
+    return false;
 }
 
 bool ::AudioPluginAudioProcessor::checkApiStatus(){
@@ -103,7 +111,17 @@ bool ::AudioPluginAudioProcessor::checkApiStatus(){
 }
 
 void ::AudioPluginAudioProcessor::updateGUIStatus(const juce::String& id, const juce::String& colour){
-    //TODO: update the text colour of the label with the id "server_connection"
+
+    auto gui = magicState.getGuiTree().getChild(1).getChild(0).getChild(1);
+
+    auto node = gui.getChildWithProperty(juce::Identifier("id"), id);
+
+    if (!node.isValid()) {
+        juce::Logger::writeToLog("Failed to find node with id: " + id);
+        return;
+    }
+    juce::var colourValue = colour;
+    node.setProperty (juce::Identifier ("label-text"), colourValue, nullptr);
 }
 
 void ::AudioPluginAudioProcessor::extractDeviceAndModelParameters(const juce::var &devicesAndModels) {
