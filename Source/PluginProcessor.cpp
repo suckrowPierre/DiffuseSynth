@@ -163,10 +163,19 @@ juce::ValueTree AudioPluginAudioProcessor::getNodeByPath(const std::vector<int>&
 }
 
 
-void ::AudioPluginAudioProcessor::setListBoxes(juce::Array<juce::var>& items){
+void ::AudioPluginAudioProcessor::fillComboBox(juce::Array<juce::var>& items, const juce::String& id){
+    auto comboBox = getNodeById(id);
 
-    //create a juce list box model from an array of strings and load it into the list box with the id "device_list"
+    if (!comboBox.isValid()) {
+        juce::Logger::writeToLog("Failed to find node with id: " + id);
+        return;
+    }
 
+    std::make_unique<juce::AudioParameterChoice>(juce::ParameterID ("models", 1), "Model", items, 0);
+    //TODO
+
+    //set the parameter to the combobox
+    comboBox.setProperty (juce::Identifier ("parameter"), juce::var("models"), nullptr);
 
 }
 
@@ -191,6 +200,8 @@ void ::AudioPluginAudioProcessor::extractDeviceAndModelParameters(const juce::va
     for (auto& device : devices) {
         juce::Logger::writeToLog(device.toString());
     }
+
+    fillComboBox(devices, "device_list");
 
     juce::Logger::writeToLog("Models:");
     for (auto& model : models) {

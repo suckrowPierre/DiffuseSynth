@@ -56,7 +56,7 @@ private:
 
 
     void updateGUIStatus(const juce::String& id, const juce::String& colour);
-    void setListBoxes(juce::Array<juce::var>& items);
+    void fillComboBox(juce::Array<juce::var>& items, const juce::String& id);
 
 
     juce::String initialPromptFieldMessage = "Prompt Me";
@@ -80,5 +80,5 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 
-    static void extractDeviceAndModelParameters(const juce::var &devicesAndModels) ;
+    void extractDeviceAndModelParameters(const juce::var &devicesAndModels) ;
 };
