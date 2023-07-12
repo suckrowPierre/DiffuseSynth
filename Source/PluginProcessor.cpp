@@ -1,269 +1,123 @@
 #include "PluginProcessor.h"
 #include "BinaryData.h"
+#include "GuiHandler.h"
+#include "api/ApiHandler.h"
+#include "util/Logger.h"
+
+juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout()
+{
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
+
+    parameters.push_back(std::make_unique<juce::AudioParameterChoice>("DEVICES", "Devices", AudioPluginConstants::devices, 0));
+    parameters.push_back(std::make_unique<juce::AudioParameterChoice>("MODELS", "Models", AudioPluginConstants::models, 0));
+    parameters.push_back(std::make_unique<juce::AudioParameterInt>("PORT", "Port", 0, 65535, 8000));
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("AUDIO_LENGTH", "Audio Length", 1.0f, 30.0f, AudioPluginConstants::initialAudioLength));
+    parameters.push_back(std::make_unique<juce::AudioParameterInt>("NUM_INFERENCE_STEPS", "Number of Inference Steps", 5,20, AudioPluginConstants::initialNumInference));
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("GUIDANCE_SCALE", "Guidance Scale", 1.0f, 5.0f, AudioPluginConstants::initialGuidanceScale));
+    parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_START_SERVER", "Auto Start Server", AudioPluginConstants::initialAutoStartServer));
+    parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_SETUP_MODEL", "Auto Setup Model", AudioPluginConstants::initialAutoModelSetup));
 
 
-//LocalizationManager* _manager = &LocalizationManager::getInstance();
 
-//==============================================================================
+    return { parameters.begin(), parameters.end() };
+}
+
+
 AudioPluginAudioProcessor::AudioPluginAudioProcessor()
         : MagicProcessor (BusesProperties()
 #if ! JucePlugin_IsMidiEffect
 #if ! JucePlugin_IsSynth
-                                  .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                                  .withInput("Input", juce::AudioChannelSet::stereo(), true)
 #endif
-                                  .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+                                  .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
 ),
-          apvts(*this, nullptr, "PARAMETERS", createParameterLayout()),
-          apiClient(std::make_unique<AudioLDMApiClient>())
+          apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
 {
-
     FOLEYS_SET_SOURCE_PATH(__FILE__);
     magicState.setGuiValueTree(BinaryData::magic_xml, BinaryData::magic_xmlSize);
+    apiHandler = std::make_unique<ApiHandler>(*this);
+    guiHandler = std::make_unique<GuiHandler>(*this, magicState);
+    setupProcessor();
 
+}
+
+AudioPluginAudioProcessor::~AudioPluginAudioProcessor() = default;
+
+void AudioPluginAudioProcessor::setupProcessor()
+{
+    setReferenceValues();
+    registerEventTriggers();
+    apiHandler->initializeApiConnection(isAutoStartServer(), isAutoModelSetup() );
+}
+
+void AudioPluginAudioProcessor::registerEventTriggers()
+{
+    magicState.addTrigger("generate", [&] { generateSampleFromPrompt(); });
+    magicState.addTrigger("refresh", [&] { refresh(); });
+    magicState.addTrigger("startServer", [&] { startServer(); });
+    magicState.addTrigger("initModel", [&] { initModel(); });
+
+}
+
+void AudioPluginAudioProcessor::setReferenceValues()
+{
     promptValue.referTo(magicState.getPropertyAsValue("prompt"));
     negativePromptValue.referTo(magicState.getPropertyAsValue("negative_prompt"));
-    audioLengthValue.referTo(magicState.getPropertyAsValue("audio_length_in_s"));
-    numInferenceValue.referTo(magicState.getPropertyAsValue("num_inference_steps"));
-    guidanceScaleValue.referTo(magicState.getPropertyAsValue("guidance_scale"));
-
-
-    magicState.addTrigger("generate", [&] {
-        generateSampleFromPrompt();
-    });
-
-    magicState.addTrigger("refresh", [&] {
-        refresh();
-    });
-
-    connectToApi();
 }
 
-AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
+void AudioPluginAudioProcessor::refresh() const
+{
+    Logger::logInfo("Refresh");
+    apiHandler->fetchStatusAndParameters();
 }
-
-//==============================================================================
-
-void:: AudioPluginAudioProcessor::connectToApi() {
-    if (apiClient) {
-        apiClient->setApiPort("8000");
-        try {
-            if (checkApiStatus()) {
-                juce::var devicesAndModels = apiClient->getSetupParameters();
-                extractDeviceAndModelParameters(devicesAndModels);
-
-                if (!checkModelStatus()) {
-                    SetupModelParameters params;
-                    //TODO: get device and repo_id from saved state
-                    params.device = "mps";
-                    params.repo_id = "audioldm-l-full";
-                    juce::Logger::writeToLog("Setting up model");
-                    if(apiClient->setupModel(params)) {
-                        juce::Logger::writeToLog("Model setup");
-                    }
-
-                } else {
-                    juce::Logger::writeToLog("Model setup");
-                }
-
-
-            }
-        } catch (const std::exception& e) {
-            juce::Logger::writeToLog("Failed to connect to API. Exception: " + juce::String(e.what()));
-        }
-    } else {
-        juce::Logger::writeToLog("Failed to connect to API. AudioLDMApiClient not initialized.");
-    }
-    refresh();
-}
-
-void ::AudioPluginAudioProcessor::refresh() {
-    checkApiStatus();
-    checkModelStatus();
-}
-
-bool ::AudioPluginAudioProcessor::checkModelStatus(){
-
-    try {
-        bool isAvailable = apiClient->isModelSetUp();
-        if (isAvailable) {
-            juce::Logger::writeToLog("Model is available");
-            updateGUIStatus(GUIModelStatusId, green);
-            return isAvailable;
-        }
-    }
-    catch (const std::exception& e) {
-    }
-    juce::Logger::writeToLog("Model is not available");
-    updateGUIStatus(GUIModelStatusId,red);
+bool AudioPluginAudioProcessor::isAutoStartServer() {
+    bool val =  magicState.getPropertyAsValue("auto_start").getValue();
+    if(val) return true;
     return false;
 }
+bool AudioPluginAudioProcessor::isAutoModelSetup() {
+    bool val = magicState.getPropertyAsValue("auto_setup").getValue();
+    if(val) return true;
+    return false;
+}
+void AudioPluginAudioProcessor::startServer() {
+    Logger::logInfo("(RE)-Starting server");
+    int port = apvts.getParameter("PORT")->getCurrentValueAsText().getIntValue();
+    bool autoStart = magicState.getPropertyAsValue("auto_start").getValue();
+    std::cout << "AutoStart: " << autoStart << std::endl;
+    std::cout << "Port: " << port << std::endl;
 
-bool ::AudioPluginAudioProcessor::checkApiStatus(){
-    bool isAvailable = apiClient->isApiAvailable();
-    if (!isAvailable) {
-        juce::Logger::writeToLog("API is not available");
-        updateGUIStatus(GUIServerStatusId,red);
-        return false;
-    }
-    juce::Logger::writeToLog("API is available");
-    updateGUIStatus(GUIServerStatusId, green);
-    return true;
+    apiHandler->startServer(port);
+    //TODO
 }
 
-juce::ValueTree AudioPluginAudioProcessor::getNodeById(const juce::String& id)
-{
-    if(nodePaths.count(id) == 0) // If the path for this id is not stored
-    {
-        juce::Identifier identifier = juce::Identifier("id");
-        auto guiTree = magicState.getGuiTree().getChild(1);
-        nodePaths[id] = searchGUITreeRecursively(guiTree, identifier, id); // Store the path
-    }
-
-    return getNodeByPath(nodePaths[id]); // Retrieve the node by the stored path
+juce::String AudioPluginAudioProcessor::getModelProperty() const {
+    return apvts.getParameter("MODELS")->getCurrentValueAsText();
 }
 
-std::vector<int> AudioPluginAudioProcessor::searchGUITreeRecursively(const juce::ValueTree& node, const juce::Identifier& identifier, const juce::String& id, std::vector<int> path)
-{
-    int numberChildren = node.getNumChildren();
-    for(int i = 0; i < numberChildren; i++)
-    {
-        auto child = node.getChild(i);
-        if(child.isValid() && child.hasProperty(identifier) && child.getProperty(identifier) == id)
-        {
-            path.push_back(i);
-            return path;
-        }
-        else
-        {
-            auto newPath = path;
-            newPath.push_back(i);
-            auto result = searchGUITreeRecursively(child, identifier, id, newPath);
-            if(!result.empty())
-            {
-                return result;
-            }
-        }
-    }
-
-    return {}; // Return an empty vector if no matching node was found
+juce::String AudioPluginAudioProcessor::getDeviceProperty() const {
+    return apvts.getParameter("DEVICES")->getCurrentValueAsText();
 }
 
-juce::ValueTree AudioPluginAudioProcessor::getNodeByPath(const std::vector<int>& path)
-{
-    auto node = magicState.getGuiTree().getChild(1); // Start from the initial node
-    for(auto index : path)
-    {
-        if(node.getNumChildren() > index)
-            node = node.getChild(index);
-        else
-            return {}; // Return an invalid ValueTree if the path does not exist
-    }
-
-    return node;
+int AudioPluginAudioProcessor::getPort() const {
+    return apvts.getParameter("PORT")->getCurrentValueAsText().getIntValue();
 }
 
-
-void ::AudioPluginAudioProcessor::fillComboBox(juce::Array<juce::var>& items, const juce::String& nodeId, const juce::String& parameterId){
-    auto comboBox = getNodeById(nodeId);
-
-    if (!comboBox.isValid()) {
-        juce::Logger::writeToLog("Failed to find node with id: " + nodeId);
-        return;
-    }
-    apvts.createAndAddParameter(std::make_unique<juce::AudioParameterChoice>(parameterId.toUpperCase(), parameterId, items, 0));
-    comboBox.setProperty (juce::Identifier ("parameter"), parameterId.toUpperCase(), nullptr);
+void AudioPluginAudioProcessor::initModel() const {
+    Logger::logInfo("(RE)-Initializing model");
+    apiHandler->initModel(getDeviceProperty(), getModelProperty());
 }
 
-juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout(){
-   std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
-
-   //TODO missing parameters
-
-   return { parameters.begin(), parameters.end() };
-}
-
-
-
-
-void ::AudioPluginAudioProcessor::updateGUIStatus(const juce::String& id, const juce::String& colour){
-
-
-    auto node = getNodeById(id);
-
-    if (!node.isValid()) {
-        juce::Logger::writeToLog("Failed to find node with id: " + id);
-        return;
-    }
-    juce::var colourValue = colour;
-    node.setProperty (juce::Identifier ("label-text"), colourValue, nullptr);
-}
-
-void ::AudioPluginAudioProcessor::extractDeviceAndModelParameters(const juce::var &devicesAndModels) {
-    juce::Array<juce::var> devices = *devicesAndModels.getProperty("devices", juce::var()).getArray();
-    juce::Array<juce::var> models = *devicesAndModels.getProperty("models", juce::var()).getArray();
-
-    juce::Logger::writeToLog("Devices:");
-    for (auto& device : devices) {
-        juce::Logger::writeToLog(device.toString());
-    }
-
-    fillComboBox(devices, "device_list", "Devices");
-
-
-    juce::Logger::writeToLog("Models:");
-    for (auto& model : models) {
-        juce::Logger::writeToLog(model.toString());
-    }
-
-    fillComboBox(models, "model_list", "Models");
-    //TODO write devies and models to GUI
-}
 
 void:: AudioPluginAudioProcessor::generateSampleFromPrompt() {
-
-    if(apiClient) {
-
-        GenerateSampleParameters params;
-        params.prompt = magicState.getPropertyAsValue("prompt").toString();
-        params.negative_prompt = magicState.getPropertyAsValue("negative_prompt").toString();
-        params.audio_length_in_s = magicState.getPropertyAsValue("audio_length_in_s").getValue();
-        params.num_inference_steps = magicState.getPropertyAsValue("num_inference_steps").getValue();
-        params.guidance_scale = magicState.getPropertyAsValue("guidance_scale").getValue();
-
-
-        juce::Logger::writeToLog("Generating sample with parameters: " + params.prompt + ", " + params.negative_prompt + ", " + juce::String(params.audio_length_in_s) + ", " + juce::String(params.num_inference_steps) + ", " + juce::String(params.guidance_scale));
-
-        try {
-            if (apiClient->generateSample(params)){
-                juce::Logger::writeToLog("Sample generated");
-            }
-
-        } catch (const std::exception& e) {
-            juce::Logger::writeToLog("Failed to generate sample. Exception: " + juce::String(e.what()));
-        }
-    }else {
-        juce::Logger::writeToLog("Failed to connect to API. AudioLDMApiClient not initialized.");
-    }
-}
-
-void:: AudioPluginAudioProcessor::setupModel(juce::String device, juce::String repo_id) {
-    if (apiClient) {
-        SetupModelParameters params;
-        params.device = device;
-        params.repo_id = repo_id;
-
-
-        try {
-            if (apiClient->setupModel(params)){
-                juce::Logger::writeToLog("successfully set up model");
-            }
-        } catch (const std::exception& e) {
-            juce::Logger::writeToLog("Failed to set up model. Exception: " + juce::String(e.what()));
-        }
-    } else {
-        juce::Logger::writeToLog("Failed to set up model. AudioLDMApiClient not initialized.");
-    }
+    apiHandler->generateSample(
+            magicState.getPropertyAsValue("prompt").toString(),
+            magicState.getPropertyAsValue("negative_prompt").toString(),
+            apvts.getParameter("AUDIO_LENGTH")->getCurrentValueAsText().getFloatValue(),
+            apvts.getParameter("NUM_INFERENCE_STEPS")->getCurrentValueAsText().getIntValue(),
+            apvts.getParameter("GUIDANCE_SCALE")->getCurrentValueAsText().getFloatValue()
+    );
 }
 
 const juce::String AudioPluginAudioProcessor::getName() const
@@ -336,12 +190,10 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     juce::ignoreUnused (sampleRate, samplesPerBlock);
-    magicState.getPropertyAsValue ("prompt").setValue(initialPromptFieldMessage);
-    magicState.getPropertyAsValue ("negative_prompt").setValue(initialNegativePromptFieldMessage);
-    magicState.getPropertyAsValue("audio_length_in_s").setValue(initialAudioLength);
-    magicState.getPropertyAsValue("num_inference_steps").setValue(initialNumInference);
-    magicState.getPropertyAsValue("guidance_scale").setValue(initialGuidanceScale);
-
+    magicState.getPropertyAsValue ("prompt").setValue(AudioPluginConstants::initialPromptFieldMessage);
+    magicState.getPropertyAsValue ("negative_prompt").setValue(AudioPluginConstants::initialNegativePromptFieldMessage);
+    magicState.getPropertyAsValue ("auto_setup").setValue(AudioPluginConstants::initialAutoModelSetup);
+    magicState.getPropertyAsValue ("auto_start").setValue(AudioPluginConstants::initialAutoStartServer);
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -412,3 +264,4 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new AudioPluginAudioProcessor();
 }
+

@@ -110,6 +110,17 @@ async def setup(params: SetupParams):
     audio_model = AudioModel(params)
     return {"message": "Setting up finished"}
 
+@app.get("/current_parameters")
+async def get_current_model_and_device():
+    global audio_model
+    if audio_model is None:
+        raise HTTPException(status_code=400, detail="Model is not set up. Please POST to /setup first.")
+    return {"device": audio_model.device, "model": audio_model.repo_id}
+
+
+
+
+
 
 @app.post("/generate")
 async def generate(params: GenerateParams):

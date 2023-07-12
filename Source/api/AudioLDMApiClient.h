@@ -9,7 +9,7 @@
 #ifndef DIFFUSESYNTH_AUDIOLDMAPICLIENT_H
 #define DIFFUSESYNTH_AUDIOLDMAPICLIENT_H
 
-#include <juce_audio_processors/juce_audio_processors.h>
+#include "juce_audio_processors/juce_audio_processors.h"
 
 
 class SetupModelParameters {
@@ -23,7 +23,7 @@ public:
     juce::String prompt;
     juce::String negative_prompt;
     float audio_length_in_s;
-    float num_inference_steps;
+    int num_inference_steps;
     float guidance_scale;
 };
 
@@ -34,7 +34,7 @@ private:
     juce::String setupEndpointPath = "/setup";
     juce::String modelStatusEndpointPath = "/model-status";
     juce::String generateSampleEndpointPath = "/generate";
-    juce::String setupParametersEndpointPath = "/setup_parameters";
+    juce::String currentParametersEndpointPath = "/current_parameters";
 
     [[nodiscard]] static juce::String getSetupBody(const SetupModelParameters& params) ;
     [[nodiscard]] static juce::String getGenerateSampleBody(const GenerateSampleParameters& params) ;
@@ -80,11 +80,11 @@ public:
     bool isApiAvailable() const;
 
     /**
-     * @brief Gets the available devices and trained models.
+     * @brief Gets the current device and model.
      *
-     * @return The available devices and trained models.
+     * @return The current device and model.
      */
-    juce::var getSetupParameters() const;
+    juce::var getCurrentParameters() const;
 
     /**
      * @brief Checks is the model is set up.
@@ -92,6 +92,13 @@ public:
      * @return true if the model is set up, false otherwise.
      */
     bool isModelSetUp() const;
+
+    /**
+     * @brief Gets the port to be used in API calls.
+     *
+     * @return The port to be used.
+     */
+    [[nodiscard]] juce::String getApiPort() const;
 };
 
 

@@ -58,32 +58,15 @@ bool AudioLDMApiClient::isApiAvailable() const{
     return true;
 }
 
-
-juce::var AudioLDMApiClient::getSetupParameters() const{
-    juce::URL url = constructApiUrl(setupParametersEndpointPath);
+juce::var AudioLDMApiClient::getCurrentParameters() const{
+    juce::URL url = constructApiUrl(currentParametersEndpointPath);
     juce::var response = sendGetRequest(url);
 
     if (!response.isObject()){
         throw std::runtime_error("Response is not a JSON object");
     }
 
-    juce::var devicesVar = response.getProperty("devices", juce::var());
-    juce::var modelsVar = response.getProperty("models", juce::var());
-
-
-    if (!devicesVar.isArray() || !modelsVar.isArray()){
-        throw std::runtime_error("Expected 'devices' and 'models' to be arrays in the response");
-    }
-
-    juce::Array<juce::var> devices = *devicesVar.getArray();
-    juce::Array<juce::var> models = *modelsVar.getArray();
-
-
-    juce::var result = juce::var(new juce::DynamicObject());
-    result.getDynamicObject()->setProperty("devices", devices);
-    result.getDynamicObject()->setProperty("models", models);
-
-    return result;
+    return response;
 }
 
 bool AudioLDMApiClient::isModelSetUp() const {
@@ -237,4 +220,11 @@ juce::String AudioLDMApiClient::getSetupBody(const SetupModelParameters& params)
 juce::String AudioLDMApiClient::getGenerateSampleBody(const GenerateSampleParameters& params) {
     juce::String body = R"({ "prompt": ")" + params.prompt + R"(", "negative_prompt": ")" + params.negative_prompt + R"(", "audio_length_in_s": ")" + std::to_string(params.audio_length_in_s) + R"(", "num_inference_steps": ")" + std::to_string(params.num_inference_steps) + + R"(", "guidance_scale": ")" + std::to_string(params.guidance_scale) + "\" }";
     return body;
+}
+
+juce::String AudioLDMApiClient::getApiPort() const {
+    if (apiPort.isEmpty()) {
+        return "";
+    }
+    return apiPort;
 }
