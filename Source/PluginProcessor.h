@@ -37,6 +37,8 @@ public:
     const juce::String getProgramName (int index) override;
     void changeProgramName (int index, const juce::String& newName) override;
 
+    juce::AudioProcessorValueTreeState apvts;
+
     //==============================================================================
 
 private:
@@ -56,7 +58,7 @@ private:
 
 
     void updateGUIStatus(const juce::String& id, const juce::String& colour);
-    void fillComboBox(juce::Array<juce::var>& items, const juce::String& id);
+    void fillComboBox(juce::Array<juce::var>& items, const juce::String& nodeId, const juce::String& parameterId);
 
 
     juce::String initialPromptFieldMessage = "Prompt Me";
@@ -76,6 +78,8 @@ private:
     juce::String GUIServerStatusId = "server_status";
     juce::String GUIModelStatusId = "model_status";
 
+
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)

@@ -14,6 +14,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                                   .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
 #endif
 ),
+          apvts(*this, nullptr, "PARAMETERS", createParameterLayout()),
           apiClient(std::make_unique<AudioLDMApiClient>())
 {
 
@@ -163,21 +164,27 @@ juce::ValueTree AudioPluginAudioProcessor::getNodeByPath(const std::vector<int>&
 }
 
 
-void ::AudioPluginAudioProcessor::fillComboBox(juce::Array<juce::var>& items, const juce::String& id){
-    auto comboBox = getNodeById(id);
+void ::AudioPluginAudioProcessor::fillComboBox(juce::Array<juce::var>& items, const juce::String& nodeId, const juce::String& parameterId){
+    auto comboBox = getNodeById(nodeId);
 
     if (!comboBox.isValid()) {
-        juce::Logger::writeToLog("Failed to find node with id: " + id);
+        juce::Logger::writeToLog("Failed to find node with id: " + nodeId);
         return;
     }
-
-    std::make_unique<juce::AudioParameterChoice>(juce::ParameterID ("models", 1), "Model", items, 0);
-    //TODO
-
-    //set the parameter to the combobox
-    comboBox.setProperty (juce::Identifier ("parameter"), juce::var("models"), nullptr);
-
+    apvts.createAndAddParameter(std::make_unique<juce::AudioParameterChoice>(parameterId.toUpperCase(), parameterId, items, 0));
+    comboBox.setProperty (juce::Identifier ("parameter"), parameterId.toUpperCase(), nullptr);
 }
+
+juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout(){
+   std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
+
+   //TODO missing parameters
+
+   return { parameters.begin(), parameters.end() };
+}
+
+
+
 
 void ::AudioPluginAudioProcessor::updateGUIStatus(const juce::String& id, const juce::String& colour){
 
@@ -201,12 +208,15 @@ void ::AudioPluginAudioProcessor::extractDeviceAndModelParameters(const juce::va
         juce::Logger::writeToLog(device.toString());
     }
 
-    fillComboBox(devices, "device_list");
+    fillComboBox(devices, "device_list", "Devices");
+
 
     juce::Logger::writeToLog("Models:");
     for (auto& model : models) {
         juce::Logger::writeToLog(model.toString());
     }
+
+    fillComboBox(models, "model_list", "Models");
     //TODO write devies and models to GUI
 }
 

@@ -122,11 +122,11 @@
             <View flex-direction="column">
               <View flex-direction="row" class="SettingsItem">
                 <Label text="pretrained-model"/>
-                <ComboBox id="device_list"/>
+                <ComboBox id="model_list"/>
               </View>
               <View flex-direction="row" class="SettingsItem">
                 <Label text="device "/>
-                <ComboBox id="model_list"/>
+                <ComboBox id="device_list"/>
               </View>
             </View>
             <TextButton text="(re)-init model" max-width="100" max-height="100" flex-align-self="stretch"
