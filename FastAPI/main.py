@@ -45,7 +45,7 @@ class GenerateParams(BaseModel):
     prompt: str
     negative_prompt: str
     audio_length_in_s: float
-    num_inference_steps: float
+    num_inference_steps: int
     guidance_scale: float
 
 
@@ -72,7 +72,7 @@ class AudioModel:
     def generate(self, params: GenerateParams):
         return self.pipe(prompt=params.prompt,
                          audio_length_in_s=params.audio_length_in_s,
-                         num_inference_steps=10,
+                         num_inference_steps=params.num_inference_steps,
                          guidance_scale=params.guidance_scale,
                          negative_prompt=params.negative_prompt).audios[0]
 
