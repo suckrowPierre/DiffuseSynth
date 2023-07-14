@@ -10,6 +10,7 @@
 #include "AudioLDMApiClient.h"
 #include <stdexcept>
 #include <string>
+#include "../Constants.h"
 
 
 /**
@@ -150,7 +151,7 @@ void AudioLDMApiClient::decodeAudio(const juce::String& audioBase64) {
     }
 
     juce::File tempFile = juce::File::getSpecialLocation (juce::File::SpecialLocationType::tempDirectory)
-            .getChildFile ("tempAudio.wav");
+            .getChildFile (AudioPluginConstants::tempFileName);
 
 
     if (tempFile.exists())

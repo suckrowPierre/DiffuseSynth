@@ -17,5 +17,7 @@ namespace AudioPluginConstants
     const juce::StringArray models = {"audioldm-s-full", "audioldm-s-full-v2", "audioldm-m-full", "audioldm-l-full"};
     const bool initialAutoStartServer = false;
     const bool initialAutoModelSetup = false;
+    const int numVoices = 3;
+    const juce::String tempFileName = "temp.wav";
 
 }

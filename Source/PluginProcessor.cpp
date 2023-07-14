@@ -40,9 +40,34 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     guiHandler = std::make_unique<GuiHandler>(*this, magicState);
     setupProcessor();
 
+    formatManager.registerBasicFormats();
+    for(int i = 0; i < AudioPluginConstants::numVoices; i++) {
+        sampler.addVoice(new juce::SamplerVoice());
+    }
 }
 
-AudioPluginAudioProcessor::~AudioPluginAudioProcessor() = default;
+AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
+        reader = nullptr;
+}
+
+void AudioPluginAudioProcessor::loadFile(){
+    Logger::logInfo("Loading file");
+   juce::String path = juce::File::getSpecialLocation(juce::File::SpecialLocationType::tempDirectory).getFullPathName() + "/" + AudioPluginConstants::tempFileName;
+   Logger::logInfo("path: " + path);
+   try {
+       juce::File file(path);
+       reader = formatManager.createReaderFor(file);
+
+       juce::BigInteger range;
+       range.setRange(0, 128, true);
+
+       sampler.addSound(new juce::SamplerSound("sample", *reader, range, 60, 0, 0.1, 10.0));
+   } catch (const std::exception& e) {
+         Logger::logException(e);
+   }
+
+
+}
 
 void AudioPluginAudioProcessor::setupProcessor()
 {
@@ -118,6 +143,7 @@ void:: AudioPluginAudioProcessor::generateSampleFromPrompt() {
             apvts.getParameter("NUM_INFERENCE_STEPS")->getCurrentValueAsText().getIntValue(),
             apvts.getParameter("GUIDANCE_SCALE")->getCurrentValueAsText().getFloatValue()
     );
+    loadFile();
 }
 
 const juce::String AudioPluginAudioProcessor::getName() const
@@ -187,9 +213,7 @@ void AudioPluginAudioProcessor::changeProgramName (int index, const juce::String
 //==============================================================================
 void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-    juce::ignoreUnused (sampleRate, samplesPerBlock);
+    sampler.setCurrentPlaybackSampleRate(sampleRate);
     magicState.getPropertyAsValue ("prompt").setValue(AudioPluginConstants::initialPromptFieldMessage);
     magicState.getPropertyAsValue ("negative_prompt").setValue(AudioPluginConstants::initialNegativePromptFieldMessage);
     magicState.getPropertyAsValue ("auto_setup").setValue(AudioPluginConstants::initialAutoModelSetup);
@@ -229,33 +253,16 @@ bool AudioPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                                               juce::MidiBuffer& midiMessages)
 {
-    juce::ignoreUnused (midiMessages);
+    //juce::ignoreUnused (midiMessages);
 
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-        juce::ignoreUnused (channelData);
-        // ..do something to the data...
-    }
+    sampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 
 //==============================================================================

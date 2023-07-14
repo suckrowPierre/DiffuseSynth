@@ -49,6 +49,11 @@ public:
 
 private:
 
+    juce::Synthesiser sampler;
+    void loadFile();
+
+    juce::AudioFormatManager formatManager;
+    juce::AudioFormatReader* reader = nullptr;
     //==============================================================================
     // GUI functions
     //==============================================================================
