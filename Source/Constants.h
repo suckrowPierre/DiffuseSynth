@@ -19,5 +19,7 @@ namespace AudioPluginConstants
     const bool initialAutoModelSetup = false;
     const int numVoices = 3;
     const juce::String tempFileName = "temp.wav";
+    const float maxPitch = 12.0f;
+    const float minPitch = -12.0f;
 
 }

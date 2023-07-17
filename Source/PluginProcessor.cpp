@@ -16,7 +16,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>("GUIDANCE_SCALE", "Guidance Scale", 1.0f, 5.0f, AudioPluginConstants::initialGuidanceScale));
     parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_START_SERVER", "Auto Start Server", AudioPluginConstants::initialAutoStartServer));
     parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_SETUP_MODEL", "Auto Setup Model", AudioPluginConstants::initialAutoModelSetup));
-
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("PITCH", "Pitch", AudioPluginConstants::minPitch, AudioPluginConstants::maxPitch,0));
 
 
     return { parameters.begin(), parameters.end() };

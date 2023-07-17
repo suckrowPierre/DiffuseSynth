@@ -136,7 +136,7 @@ juce_add_binary_data(DiffuseSynthBinaryData
         SOURCES
         Resources/lng/english.json
         Resources/lng/german.json
-        Resources/magic.xml )
+        Resources/magic.xml)
 
 target_link_libraries(DiffuseSynth
         PRIVATE
