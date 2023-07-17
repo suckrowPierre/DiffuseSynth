@@ -76,7 +76,8 @@
                           flex-align-self="stretch"/>
             </View>
             <Slider slider-type="rotary" slider-textbox="textbox-right" caption="tune"
-                    flex-grow="1.5" margin="0" padding="0" lookAndFeel="Skeuomorphic" parameter="PITCH"/>
+                    flex-grow="1.5" margin="0" padding="0" lookAndFeel="Skeuomorphic"
+                    parameter="PITCH"/>
           </View>
         </View>
         <View flex-direction="column" flex-grow="3" lookAndFeel="">
@@ -111,8 +112,8 @@
         </View>
         <View flex-direction="column">
           <View max-height="200" caption="">
-            <Meter caption=""/>
-            <Slider caption="gain"/>
+            <Meter caption="" source="output" bar-fill-color="FF3E54CD"/>
+            <Slider caption="gain" lookAndFeel="Skeuomorphic"/>
           </View>
           <View/>
         </View>

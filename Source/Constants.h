@@ -21,5 +21,6 @@ namespace AudioPluginConstants
     const juce::String tempFileName = "temp.wav";
     const float maxPitch = 12.0f;
     const float minPitch = -12.0f;
+    const int maxKeepMS = 300;
 
 }

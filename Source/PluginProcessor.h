@@ -54,6 +54,9 @@ private:
 
     juce::AudioFormatManager formatManager;
     juce::AudioFormatReader* reader = nullptr;
+
+    foleys::MagicLevelSource* outputMeter  = nullptr;
+
     //==============================================================================
     // GUI functions
     //==============================================================================

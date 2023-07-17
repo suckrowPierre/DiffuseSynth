@@ -36,6 +36,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 {
     FOLEYS_SET_SOURCE_PATH(__FILE__);
     magicState.setGuiValueTree(BinaryData::magic_xml, BinaryData::magic_xmlSize);
+    outputMeter = magicState.createAndAddObject<foleys::MagicLevelSource>("output");
     apiHandler = std::make_unique<ApiHandler>(*this);
     guiHandler = std::make_unique<GuiHandler>(*this, magicState);
     setupProcessor();
@@ -214,6 +215,7 @@ void AudioPluginAudioProcessor::changeProgramName (int index, const juce::String
 void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     sampler.setCurrentPlaybackSampleRate(sampleRate);
+    outputMeter->setupSource(getTotalNumOutputChannels(), sampleRate, 300);
     magicState.getPropertyAsValue ("prompt").setValue(AudioPluginConstants::initialPromptFieldMessage);
     magicState.getPropertyAsValue ("negative_prompt").setValue(AudioPluginConstants::initialNegativePromptFieldMessage);
     magicState.getPropertyAsValue ("auto_setup").setValue(AudioPluginConstants::initialAutoModelSetup);
@@ -263,6 +265,8 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.clear (i, 0, buffer.getNumSamples());
 
     sampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
+    outputMeter->pushSamples(buffer);
 }
 
 //==============================================================================
