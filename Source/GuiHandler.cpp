@@ -30,18 +30,17 @@ juce::ValueTree GuiHandler::getNodeByIdAndLogIfInvalid(const juce::String& nodeI
     return node;
 }
 
-/*
-juce::String GuiHandler::getCurrentComboBoxValue(const juce::String &id) {
-
-    juce::ComboBox node = getNodeByIdAndLogIfInvalid(id).;
+void GuiHandler::drawWaveform(const juce::String &id, const juce::AudioBuffer<float> &buffer) {
+    auto node = getNodeByIdAndLogIfInvalid(id);
     if (!node.isValid())
-        return "";
+        return;
 
-    return node.getProperty(juce::Identifier("current-value")).toString();
+    if(node.isValid()) {
+       // daw a line for a test and put it as a child to the node
+       auto line = juce::Line<float>(0,0,100,100);
 
-
+    }
 }
-*/
 
 
 

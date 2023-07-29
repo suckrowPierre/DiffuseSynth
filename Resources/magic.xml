@@ -82,10 +82,7 @@
         </View>
         <View flex-direction="column" flex-grow="3" lookAndFeel="">
           <View flex-direction="row" lookAndFeel="">
-            <View flex-direction="column">
-              <Label pos-x="-2.85714%" pos-y="-1.77305%" pos-width="100%" pos-height="100%"
-                     text="Waveform" font-size="50"/>
-              <Plot/>
+            <View id="waveform" flex-direction="column">
             </View>
             <View>
               <Label pos-x="-2.85714%" pos-y="-1.77305%" pos-width="100%" pos-height="100%"

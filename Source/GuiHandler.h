@@ -18,6 +18,7 @@ public:
     GuiHandler(AudioPluginAudioProcessor& processor, foleys::MagicProcessorState& magicState);
 
     void updateGUIStatus(const juce::String& id, const juce::String& colour);
+    void drawWaveform(const juce::String& id, const juce::AudioBuffer<float>& buffer);
 
    // juce::String getCurrentComboBoxValue(const juce::String& id);
 

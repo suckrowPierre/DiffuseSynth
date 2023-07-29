@@ -23,6 +23,7 @@ public:
     bool isAutoModelSetup();
     int getPort() const;
 
+    void initialiseBuilder (foleys::MagicGUIBuilder& builder) override;
     //==============================================================================
     // AudioProcessor overrides
     //==============================================================================
@@ -54,6 +55,8 @@ private:
 
     juce::AudioFormatManager formatManager;
     juce::AudioFormatReader* reader = nullptr;
+
+    juce::AudioBuffer<float> waveForm;
 
     foleys::MagicLevelSource* outputMeter  = nullptr;
 

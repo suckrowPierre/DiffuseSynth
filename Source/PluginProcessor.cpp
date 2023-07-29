@@ -4,6 +4,70 @@
 #include "api/ApiHandler.h"
 #include "util/Logger.h"
 
+class TestComponent : public juce::Component {
+public:
+    enum ColourIDs {
+        // we are safe from collissions, because we set the colours on every component directly from the stylesheet
+        backgroundColourId,
+        drawColourId,
+        fillColourId
+    };
+
+    TestComponent() {
+        setColour(backgroundColourId, juce::Colours::black);
+        setColour(drawColourId, juce::Colours::white);
+        setColour(fillColourId, juce::Colours::transparentBlack);
+    }
+
+    void paint(juce::Graphics& g) override {
+        g.fillAll(findColour(backgroundColourId));
+        g.setColour(findColour(drawColourId));
+        g.drawRect(getLocalBounds(), 1);
+        g.setColour(findColour(fillColourId));
+        g.fillRect(getLocalBounds());
+    }
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TestComponent)
+};
+
+class TestItem: public foleys::GuiItem {
+public:
+    FOLEYS_DECLARE_GUI_FACTORY (TestItem)
+
+    TestItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) : foleys::GuiItem (builder, node)
+    {
+        setColourTranslation ({
+                                      {"testComponent-background", TestComponent::backgroundColourId},
+                                      {"testComponent-draw", TestComponent::drawColourId},
+                                      {"testComponent-fill", TestComponent::fillColourId} });
+
+        addAndMakeVisible (test);
+    }
+
+    std::vector<foleys::SettableProperty> getSettableProperties() const override
+    {
+        std::vector<foleys::SettableProperty> newProperties;
+        return newProperties;
+    }
+
+    void update() override
+    {
+    }
+
+
+    juce::Component* getWrappedComponent() override
+    {
+        return &test;
+    }
+private:
+    TestComponent test;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TestItem)
+};
+
+
+
 juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout()
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
@@ -57,6 +121,13 @@ AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
         reader = nullptr;
 }
 
+void AudioPluginAudioProcessor::initialiseBuilder (foleys::MagicGUIBuilder& builder)
+{
+    builder.registerJUCEFactories();
+
+    builder.registerFactory ("TestItem", &TestItem::factory);
+}
+
 void AudioPluginAudioProcessor::loadFile(){
     Logger::logInfo("Loading file");
    juce::String path = juce::File::getSpecialLocation(juce::File::SpecialLocationType::tempDirectory).getFullPathName() + "/" + AudioPluginConstants::tempFileName;
@@ -68,7 +139,23 @@ void AudioPluginAudioProcessor::loadFile(){
        juce::BigInteger range;
        range.setRange(0, 128, true);
 
+       auto sampleLength = static_cast<int>(reader->lengthInSamples);
+       waveForm.setSize(1, sampleLength);
+       reader->read(&waveForm,0,sampleLength, 0, true, true);
+
+       auto buffer = waveForm.getReadPointer(0);
+
+       /*
+       for(int sample = 0; sample < sampleLength; sample++) {
+           auto sampleValue = buffer[sample];
+           std::cout << sampleValue << std::endl;
+       }
+        */
+
+
+
        sampler.addSound(new juce::SamplerSound("sample", *reader, range, 60, 0, 0.1, 10.0));
+      // waveformPlot->pushSamples(buffer);
    } catch (const std::exception& e) {
          Logger::logException(e);
    }
