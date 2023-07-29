@@ -12,7 +12,7 @@ pipe = None
 
 
 class Models(Enum):
-    S = "audioldm-s-full"
+    # S = "audioldm-s-full"
     SV2 = "audioldm-s-full-v2"
     M = "audioldm-m-full"
     L = "audioldm-l-full"
@@ -84,6 +84,16 @@ audio_model = None
 async def root():
     return {
         "message": "alive"
+    }
+
+
+@app.get("/init-all-models-once")
+async def init_all_models_once():
+    for model in Models:
+        model_id = "cvssp/" + model.value
+        AudioLDMPipeline.from_pretrained(model_id, torch_dtype=torch.float32)
+    return {
+        "allModelsDownloaded": "true"
     }
 
 @app.get("/model-status")

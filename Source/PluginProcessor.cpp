@@ -36,6 +36,12 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 {
     FOLEYS_SET_SOURCE_PATH(__FILE__);
     magicState.setGuiValueTree(BinaryData::magic_xml, BinaryData::magic_xmlSize);
+
+    magicState.getPropertyAsValue ("prompt").setValue(AudioPluginConstants::initialPromptFieldMessage);
+    magicState.getPropertyAsValue ("negative_prompt").setValue(AudioPluginConstants::initialNegativePromptFieldMessage);
+    magicState.getPropertyAsValue ("auto_setup").setValue(AudioPluginConstants::initialAutoModelSetup);
+    magicState.getPropertyAsValue ("auto_start").setValue(AudioPluginConstants::initialAutoStartServer);
+
     outputMeter = magicState.createAndAddObject<foleys::MagicLevelSource>("output");
     apiHandler = std::make_unique<ApiHandler>(*this);
     guiHandler = std::make_unique<GuiHandler>(*this, magicState);
@@ -215,11 +221,9 @@ void AudioPluginAudioProcessor::changeProgramName (int index, const juce::String
 void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     sampler.setCurrentPlaybackSampleRate(sampleRate);
-    outputMeter->setupSource(getTotalNumOutputChannels(), sampleRate, 300);
-    magicState.getPropertyAsValue ("prompt").setValue(AudioPluginConstants::initialPromptFieldMessage);
-    magicState.getPropertyAsValue ("negative_prompt").setValue(AudioPluginConstants::initialNegativePromptFieldMessage);
-    magicState.getPropertyAsValue ("auto_setup").setValue(AudioPluginConstants::initialAutoModelSetup);
-    magicState.getPropertyAsValue ("auto_start").setValue(AudioPluginConstants::initialAutoStartServer);
+    outputMeter->setupSource(getTotalNumOutputChannels(), sampleRate, AudioPluginConstants::maxKeepMS);
+    //magicState.prepareToPlay(sampleRate, samplesPerBlock);
+
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -257,7 +261,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 {
     //juce::ignoreUnused (midiMessages);
 
-    juce::ScopedNoDenormals noDenormals;
+    //juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
@@ -267,6 +271,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     sampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
     outputMeter->pushSamples(buffer);
+
 }
 
 //==============================================================================
