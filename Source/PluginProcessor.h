@@ -4,7 +4,7 @@
 #include "../Modules/foleys_gui_magic/foleys_gui_magic.h"
 #include "Constants.h"
 #include "GuiHandler.h"
-#include "api/ApiHandler.h"
+#include "Api//ApiHandler.h"
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public foleys::MagicProcessor
@@ -23,7 +23,9 @@ public:
     bool isAutoModelSetup();
     int getPort() const;
 
+
     void initialiseBuilder (foleys::MagicGUIBuilder& builder) override;
+
     //==============================================================================
     // AudioProcessor overrides
     //==============================================================================

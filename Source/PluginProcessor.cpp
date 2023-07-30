@@ -1,72 +1,8 @@
 #include "PluginProcessor.h"
 #include "BinaryData.h"
 #include "GuiHandler.h"
-#include "api/ApiHandler.h"
-#include "util/Logger.h"
-
-class TestComponent : public juce::Component {
-public:
-    enum ColourIDs {
-        // we are safe from collissions, because we set the colours on every component directly from the stylesheet
-        backgroundColourId,
-        drawColourId,
-        fillColourId
-    };
-
-    TestComponent() {
-        setColour(backgroundColourId, juce::Colours::black);
-        setColour(drawColourId, juce::Colours::white);
-        setColour(fillColourId, juce::Colours::transparentBlack);
-    }
-
-    void paint(juce::Graphics& g) override {
-        g.fillAll(findColour(backgroundColourId));
-        g.setColour(findColour(drawColourId));
-        g.drawRect(getLocalBounds(), 1);
-        g.setColour(findColour(fillColourId));
-        g.fillRect(getLocalBounds());
-    }
-
-private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TestComponent)
-};
-
-class TestItem: public foleys::GuiItem {
-public:
-    FOLEYS_DECLARE_GUI_FACTORY (TestItem)
-
-    TestItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) : foleys::GuiItem (builder, node)
-    {
-        setColourTranslation ({
-                                      {"testComponent-background", TestComponent::backgroundColourId},
-                                      {"testComponent-draw", TestComponent::drawColourId},
-                                      {"testComponent-fill", TestComponent::fillColourId} });
-
-        addAndMakeVisible (test);
-    }
-
-    std::vector<foleys::SettableProperty> getSettableProperties() const override
-    {
-        std::vector<foleys::SettableProperty> newProperties;
-        return newProperties;
-    }
-
-    void update() override
-    {
-    }
-
-
-    juce::Component* getWrappedComponent() override
-    {
-        return &test;
-    }
-private:
-    TestComponent test;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TestItem)
-};
-
-
+#include "Util/Logger.h"
+#include "Components/WaveFormDisplay.h"
 
 juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout()
 {
@@ -103,7 +39,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 
     magicState.getPropertyAsValue ("prompt").setValue(AudioPluginConstants::initialPromptFieldMessage);
     magicState.getPropertyAsValue ("negative_prompt").setValue(AudioPluginConstants::initialNegativePromptFieldMessage);
-    magicState.getPropertyAsValue ("auto_setup").setValue(AudioPluginConstants::initialAutoModelSetup);
+    magicState.getPropertyAsValue ("auto_setup").setValue( AudioPluginConstants::initialAutoModelSetup);
     magicState.getPropertyAsValue ("auto_start").setValue(AudioPluginConstants::initialAutoStartServer);
 
     outputMeter = magicState.createAndAddObject<foleys::MagicLevelSource>("output");
@@ -121,12 +57,17 @@ AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
         reader = nullptr;
 }
 
+
 void AudioPluginAudioProcessor::initialiseBuilder (foleys::MagicGUIBuilder& builder)
 {
-    builder.registerJUCEFactories();
 
-    builder.registerFactory ("TestItem", &TestItem::factory);
+    builder.registerJUCEFactories();
+    builder.registerJUCELookAndFeels();
+
+    builder.registerFactory ("WaveFormDisplay", &WaveFormDisplayItem::factory);
+
 }
+
 
 void AudioPluginAudioProcessor::loadFile(){
     Logger::logInfo("Loading file");

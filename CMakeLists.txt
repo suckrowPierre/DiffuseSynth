@@ -93,12 +93,13 @@ target_sources(DiffuseSynth
     PRIVATE
         Source/PluginProcessor.cpp
         Source/LocalizationManager.cpp
-        Source/api/AudioLDMApiClient.cpp
-        Source/util/Logger.cpp
+        Source/Api/AudioLDMApiClient.cpp
+        Source/Util/Logger.cpp
         Source/Constants.h
         Source/GuiHandler.cpp
-        Source/api/ApiHandler.cpp
-        Source/util/GuiHelpers.cpp
+        Source/Api/ApiHandler.cpp
+        Source/Util/GuiHelpers.cpp
+        Source/Components/WaveFormDisplay.cpp
         Modules/foleys_gui_magic/foleys_gui_magic.cpp
         )
 
