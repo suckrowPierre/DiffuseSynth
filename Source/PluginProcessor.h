@@ -5,6 +5,7 @@
 #include "Constants.h"
 #include "GuiHandler.h"
 #include "Api//ApiHandler.h"
+#include "Components/SampleHolder.h"
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public foleys::MagicProcessor
@@ -59,6 +60,7 @@ private:
     juce::AudioFormatReader* reader = nullptr;
 
     juce::AudioBuffer<float> waveForm;
+    SampleHolder* holder;
 
     foleys::MagicLevelSource* outputMeter  = nullptr;
 

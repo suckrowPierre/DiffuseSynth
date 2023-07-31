@@ -18,7 +18,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
     parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_SETUP_MODEL", "Auto Setup Model", AudioPluginConstants::initialAutoModelSetup));
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>("PITCH", "Pitch", AudioPluginConstants::minPitch, AudioPluginConstants::maxPitch,0));
 
-
     return { parameters.begin(), parameters.end() };
 }
 
@@ -43,6 +42,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     magicState.getPropertyAsValue ("auto_start").setValue(AudioPluginConstants::initialAutoStartServer);
 
     outputMeter = magicState.createAndAddObject<foleys::MagicLevelSource>("output");
+    holder = magicState.createAndAddObject<SampleHolder>("sample");
     apiHandler = std::make_unique<ApiHandler>(*this);
     guiHandler = std::make_unique<GuiHandler>(*this, magicState);
     setupProcessor();
@@ -84,19 +84,14 @@ void AudioPluginAudioProcessor::loadFile(){
        waveForm.setSize(1, sampleLength);
        reader->read(&waveForm,0,sampleLength, 0, true, true);
 
-       auto buffer = waveForm.getReadPointer(0);
 
-       /*
-       for(int sample = 0; sample < sampleLength; sample++) {
-           auto sampleValue = buffer[sample];
-           std::cout << sampleValue << std::endl;
+       try {
+           holder->setFileName(path);
+       } catch (const std::exception& e) {
+           Logger::logException(e);
        }
-        */
-
-
 
        sampler.addSound(new juce::SamplerSound("sample", *reader, range, 60, 0, 0.1, 10.0));
-      // waveformPlot->pushSamples(buffer);
    } catch (const std::exception& e) {
          Logger::logException(e);
    }

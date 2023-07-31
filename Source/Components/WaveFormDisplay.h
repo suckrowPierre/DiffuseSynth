@@ -7,6 +7,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "../../Modules/foleys_gui_magic/foleys_gui_magic.h"
+#include "../PluginProcessor.h"
 
 class WaveFormDisplay : public juce::Component{
 public:
@@ -21,12 +22,14 @@ public:
     ~WaveFormDisplay() override;
 
     void paint(juce::Graphics& g) override;
+    void setThumbnail(juce::AudioThumbnail& thumbnail);
 
 private:
+    juce::AudioThumbnail* thumbnail_;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveFormDisplay)
 };
 
-class WaveFormDisplayItem: public foleys::GuiItem {
+class WaveFormDisplayItem: public foleys::GuiItem, public juce::ChangeListener {
 public:
     FOLEYS_DECLARE_GUI_FACTORY (WaveFormDisplayItem)
     WaveFormDisplayItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node);
@@ -38,6 +41,8 @@ public:
 
 private:
     WaveFormDisplay waveFormDisplayItem_;
+    SampleHolder* holder;
+    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveFormDisplayItem)
 
 
