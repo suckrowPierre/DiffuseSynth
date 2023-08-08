@@ -42,12 +42,13 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     magicState.getPropertyAsValue ("auto_start").setValue(AudioPluginConstants::initialAutoStartServer);
 
     outputMeter = magicState.createAndAddObject<foleys::MagicLevelSource>("output");
-    holder = magicState.createAndAddObject<SampleHolder>("sample");
+    formatManager.registerBasicFormats();
+    //holder = magicState.createAndAddObject<SampleHolder>("Waveform", thumbnailCache, formatManager);
+    audioThumbnail = magicState.createAndAddObject<foleys::WaveformHolder>("Waveform", thumbnailCache, formatManager);
     apiHandler = std::make_unique<ApiHandler>(*this);
     guiHandler = std::make_unique<GuiHandler>(*this, magicState);
     setupProcessor();
 
-    formatManager.registerBasicFormats();
     for(int i = 0; i < AudioPluginConstants::numVoices; i++) {
         sampler.addVoice(new juce::SamplerVoice());
     }
@@ -60,11 +61,14 @@ AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
 
 void AudioPluginAudioProcessor::initialiseBuilder (foleys::MagicGUIBuilder& builder)
 {
-
+    std::cout << "initialiseBuilder" << std::endl;
     builder.registerJUCEFactories();
     builder.registerJUCELookAndFeels();
 
-    builder.registerFactory ("WaveFormDisplay", &WaveFormDisplayItem::factory);
+    //builder.registerFactory ("WaveFormDisplay", &WaveFormDisplayItem::factory);
+    builder.registerFactory("Waveform", &foleys::WaveformItem::factory);
+
+
 
 }
 
@@ -85,11 +89,7 @@ void AudioPluginAudioProcessor::loadFile(){
        reader->read(&waveForm,0,sampleLength, 0, true, true);
 
 
-       try {
-           holder->setFileName(path);
-       } catch (const std::exception& e) {
-           Logger::logException(e);
-       }
+       audioThumbnail->setAudioFile(file);
 
        sampler.addSound(new juce::SamplerSound("sample", *reader, range, 60, 0, 0.1, 10.0));
    } catch (const std::exception& e) {

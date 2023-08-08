@@ -7,51 +7,86 @@
 
 
 WaveFormDisplay::WaveFormDisplay() {
-    setColour(backgroundColourId, juce::Colours::black);
-    setColour(drawColourId, juce::Colours::white);
-    setColour(fillColourId, juce::Colours::transparentBlack);
+    setColour (ColourIDs::waveformBackgroundColour, juce::Colours::transparentBlack);
+    setColour (ColourIDs::waveformForegroundColour, juce::Colours::orangered);
 }
 
 WaveFormDisplay::~WaveFormDisplay() {
+    if (sampleHolder)
+        sampleHolder->removeChangeListener (this);
 }
 
-void WaveFormDisplay::setThumbnail(juce::AudioThumbnail& thumbnail){
-    thumbnail_ = &thumbnail;
-}
 
 
-void WaveFormDisplay::paint(juce::Graphics& g) {
-g.fillAll(findColour(backgroundColourId));
-    juce::Rectangle<int> thumbnailBounds = getLocalBounds();
-
-    g.setColour (juce::Colours::red);                               // [8]
-
-    g.setColour (juce::Colours::darkgrey);
-    g.fillRect (thumbnailBounds);
-    g.setColour (juce::Colours::white);
-    g.drawFittedText ("no sample generated", thumbnailBounds, juce::Justification::centred, 1);
-}
-
-WaveFormDisplayItem::WaveFormDisplayItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) : foleys::GuiItem (builder, node)
+void WaveFormDisplay::paint (juce::Graphics& g)
 {
-setColourTranslation ({
-{"testComponent-background", WaveFormDisplay::backgroundColourId},
-{"testComponent-draw", WaveFormDisplay::drawColourId},
-{"testComponent-fill", WaveFormDisplay::fillColourId} });
+    std::cout << "paint" << std::endl;
+    auto background = findColour (ColourIDs::waveformBackgroundColour);
+    auto foreground = findColour (ColourIDs::waveformForegroundColour);
 
-addAndMakeVisible (waveFormDisplayItem_);
-    holder = getMagicState().getObjectWithType<SampleHolder>("sample");
-    if (holder == nullptr) {
-       std::cout << "holder is null" << std::endl;
-    } else {
-        holder->addChangeListener(this);
+    if (!background.isTransparent())
+    {
+        g.fillAll (background);
     }
+
+    g.setColour (foreground);
+
+    if (thumbnail)
+    {
+        auto peak = thumbnail->getApproximatePeak();
+        thumbnail->drawChannels (g, getLocalBounds().reduced (3), 0.0, thumbnail->getTotalLength(), peak > 0.0f ? 1.0f / peak : 1.0f);
+    }
+    else
+        g.drawFittedText (TRANS ("No File"), getLocalBounds(), juce::Justification::centred, 1);
 }
 
-WaveFormDisplayItem::~WaveFormDisplayItem()
+void WaveFormDisplay::setAudioThumbnail (SampleHolder* holder)
 {
-    holder->removeChangeListener(this);
+    if (sampleHolder)
+        sampleHolder->removeChangeListener (this);
+
+    sampleHolder = holder;
+
+    updateAudioFile();
+
+    if (sampleHolder)
+        sampleHolder->addChangeListener (this);
 }
+
+void WaveFormDisplay::updateAudioFile()
+{
+    std::cout << "updateAudioFile" << std::endl;
+    if (!sampleHolder)
+    {
+        thumbnail.reset();
+        return;
+    }
+
+    if (!sampleHolder->getAudioFile().existsAsFile())
+        return;
+
+    std::cout << "updateAudioFile2" << std::endl;
+    thumbnail = std::make_unique<juce::AudioThumbnail> (256, sampleHolder->getManager(), sampleHolder->getCache());
+    thumbnail->setSource (new juce::FileInputSource (sampleHolder->getAudioFile()));
+    thumbnail->addChangeListener (this);
+}
+
+void WaveFormDisplay::changeListenerCallback ([[maybe_unused]] juce::ChangeBroadcaster* sender)
+{
+    if (sender == sampleHolder)
+        updateAudioFile();
+
+    repaint();
+}
+
+WaveFormDisplayItem::WaveFormDisplayItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) : GuiItem (builder, node)
+{
+    setColourTranslation ({ { "waveform-background", WaveFormDisplay::ColourIDs::waveformBackgroundColour },
+                            { "waveform-colour", WaveFormDisplay::ColourIDs::waveformForegroundColour } });
+
+    addAndMakeVisible (waveFormDisplayItem);
+}
+WaveFormDisplayItem::~WaveFormDisplayItem() = default;
 
 std::vector<foleys::SettableProperty> WaveFormDisplayItem::getSettableProperties() const
 {
@@ -62,34 +97,16 @@ return newProperties;
 void WaveFormDisplayItem::update()
 {
 
-    std::cout << "update" << std::endl;
-    juce::String fileName = "";
-    try {
-        fileName = holder->getFileName();
-        std::cout << fileName << std::endl;
-    } catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
-    }
-    if(fileName == ""){
-        return;
-    }
+    auto& state          = getMagicState();
+    auto* audioThumbnail = state.getObjectWithType<SampleHolder> ("Waveform");
 
-    juce::AudioFormatManager formatManager;
-    formatManager.registerBasicFormats();
-    auto thumbnail = juce::AudioThumbnail(512, formatManager,  holder->getThumbnailCache());
-    thumbnail.setSource(new juce::FileInputSource(holder->getFileName()));
-    std::cout << thumbnail.getTotalLength() << std::endl;
-}
-
-void WaveFormDisplayItem::changeListenerCallback(juce::ChangeBroadcaster* source) {
-    if (source == holder && holder != nullptr) {
-        update();
-    }
-
+    waveFormDisplayItem.setAudioThumbnail (audioThumbnail);
 }
 
 
 juce::Component* WaveFormDisplayItem::getWrappedComponent()
 {
-return &waveFormDisplayItem_;
+return &waveFormDisplayItem;
 }
+
+

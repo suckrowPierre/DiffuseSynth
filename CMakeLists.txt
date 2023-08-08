@@ -102,6 +102,7 @@ target_sources(DiffuseSynth
         Source/Components/WaveFormDisplay.cpp
         Source/Components/SampleHolder.cpp
         Modules/foleys_gui_magic/foleys_gui_magic.cpp
+        Source/Waveform.cpp
         )
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer

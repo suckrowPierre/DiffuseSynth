@@ -9,27 +9,31 @@
 #include "../../Modules/foleys_gui_magic/foleys_gui_magic.h"
 #include "../PluginProcessor.h"
 
-class WaveFormDisplay : public juce::Component{
+class WaveFormDisplay : public juce::Component, juce::ChangeListener{
 public:
     enum ColourIDs {
         // we are safe from collissions, because we set the colours on every component directly from the stylesheet
-        backgroundColourId,
-        drawColourId,
-        fillColourId
+        waveformBackgroundColour,
+        waveformForegroundColour
     };
 
     WaveFormDisplay();
     ~WaveFormDisplay() override;
 
     void paint(juce::Graphics& g) override;
-    void setThumbnail(juce::AudioThumbnail& thumbnail);
+    void setAudioThumbnail (SampleHolder* holder);
+    void updateAudioFile();
+
+    void changeListenerCallback ([[maybe_unused]] juce::ChangeBroadcaster* sender) override;
 
 private:
-    juce::AudioThumbnail* thumbnail_;
+    SampleHolder* sampleHolder = nullptr;
+    std::unique_ptr<juce::AudioThumbnail> thumbnail;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveFormDisplay)
 };
 
-class WaveFormDisplayItem: public foleys::GuiItem, public juce::ChangeListener {
+class WaveFormDisplayItem: public foleys::GuiItem{
 public:
     FOLEYS_DECLARE_GUI_FACTORY (WaveFormDisplayItem)
     WaveFormDisplayItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node);
@@ -40,9 +44,7 @@ public:
     juce::Component* getWrappedComponent() override;
 
 private:
-    WaveFormDisplay waveFormDisplayItem_;
-    SampleHolder* holder;
-    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
+    WaveFormDisplay waveFormDisplayItem;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveFormDisplayItem)
 
 

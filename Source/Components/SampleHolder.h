@@ -10,17 +10,23 @@
 
 class SampleHolder: public juce::ChangeBroadcaster {
 public:
-    SampleHolder();
+    SampleHolder(juce::AudioThumbnailCache& cache, juce::AudioFormatManager& manager);
     ~SampleHolder() override;
 
 
-   juce::AudioThumbnailCache& getThumbnailCache();
-   void setFileName(juce::String fileName);
-    juce::String getFileName();
-private:
-    juce::AudioThumbnailCache thumbnailCache_ = juce::AudioThumbnailCache(1);
-    juce::String fileName_;
+    void setAudioFile (juce::File file);
+    juce::File getAudioFile() const;
 
+    juce::AudioThumbnailCache& getCache();
+    juce::AudioFormatManager&  getManager();
+
+private:
+    juce::AudioFormatManager& formatManager;
+    juce::AudioThumbnailCache& thumbnailCache;
+    juce::File audioFile;
+
+
+    JUCE_DECLARE_WEAK_REFERENCEABLE (SampleHolder)
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleHolder)
 };
 
