@@ -2,7 +2,6 @@
 #include "BinaryData.h"
 #include "GuiHandler.h"
 #include "Util/Logger.h"
-#include "Components/WaveFormDisplay.h"
 
 juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout()
 {
@@ -43,7 +42,6 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 
     outputMeter = magicState.createAndAddObject<foleys::MagicLevelSource>("output");
     formatManager.registerBasicFormats();
-    //holder = magicState.createAndAddObject<SampleHolder>("Waveform", thumbnailCache, formatManager);
     audioThumbnail = magicState.createAndAddObject<foleys::WaveformHolder>("Waveform", thumbnailCache, formatManager);
     apiHandler = std::make_unique<ApiHandler>(*this);
     guiHandler = std::make_unique<GuiHandler>(*this, magicState);
@@ -75,28 +73,38 @@ void AudioPluginAudioProcessor::initialiseBuilder (foleys::MagicGUIBuilder& buil
 
 void AudioPluginAudioProcessor::loadFile(){
     Logger::logInfo("Loading file");
-   juce::String path = juce::File::getSpecialLocation(juce::File::SpecialLocationType::tempDirectory).getFullPathName() + "/" + AudioPluginConstants::tempFileName;
-   Logger::logInfo("path: " + path);
-   try {
-       juce::File file(path);
-       reader = formatManager.createReaderFor(file);
 
-       juce::BigInteger range;
-       range.setRange(0, 128, true);
+    // Use File::getSpecialLocation to access the temp directory
+    juce::File file(juce::File::getSpecialLocation(juce::File::SpecialLocationType::tempDirectory)
+                            .getChildFile(AudioPluginConstants::tempFileName));
+    Logger::logInfo("path: " + file.getFullPathName());
 
-       auto sampleLength = static_cast<int>(reader->lengthInSamples);
-       waveForm.setSize(1, sampleLength);
-       reader->read(&waveForm,0,sampleLength, 0, true, true);
+    if (file.existsAsFile())
+    {
+        std::unique_ptr<juce::AudioFormatReader> readerPtr(formatManager.createReaderFor(file));
 
+        if (readerPtr)
+        {
+            juce::BigInteger range;
+            range.setRange(0, 128, true);
 
-       audioThumbnail->setAudioFile(file);
+            auto sampleLength = static_cast<int>(readerPtr->lengthInSamples);
+            waveForm.setSize(1, sampleLength);
+            readerPtr->read(&waveForm, 0, sampleLength, 0, true, true);
 
-       sampler.addSound(new juce::SamplerSound("sample", *reader, range, 60, 0, 0.1, 10.0));
-   } catch (const std::exception& e) {
-         Logger::logException(e);
-   }
+            audioThumbnail->setAudioFile(file);
 
-
+            sampler.addSound(new juce::SamplerSound("sample", *readerPtr, range, 60, 0, 0.1, 10.0));
+        }
+        else
+        {
+            Logger::logError("Unable to create reader for file");
+        }
+    }
+    else
+    {
+        Logger::logError("File does not exist");
+    }
 }
 
 void AudioPluginAudioProcessor::setupProcessor()

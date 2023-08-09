@@ -15,23 +15,14 @@ public:
     AudioPluginAudioProcessor();
     ~AudioPluginAudioProcessor() override;
 
-    juce::AudioProcessorValueTreeState apvts;
+
     std::unique_ptr<ApiHandler> apiHandler;
     std::unique_ptr<GuiHandler> guiHandler;
-
-    juce::String getModelProperty() const;
-    juce::String getDeviceProperty() const;
-    bool isAutoStartServer();
-    bool isAutoModelSetup();
-    int getPort() const;
-
-
-    void initialiseBuilder (foleys::MagicGUIBuilder& builder) override;
 
     //==============================================================================
     // AudioProcessor overrides
     //==============================================================================
-
+    void initialiseBuilder (foleys::MagicGUIBuilder& builder) override;
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
@@ -52,48 +43,39 @@ public:
     const juce::String getProgramName (int index) override;
     void changeProgramName (int index, const juce::String& newName) override;
 
+
+    //==============================================================================
+    // Program getters
+    //==============================================================================
+    juce::String getModelProperty() const;
+    juce::String getDeviceProperty() const;
+    bool isAutoStartServer();
+    bool isAutoModelSetup();
+    int getPort() const;
+
 private:
 
-    juce::Synthesiser sampler;
     void loadFile();
-
-    juce::AudioFormatManager formatManager;
-    juce::AudioFormatReader* reader = nullptr;
-
-    juce::AudioBuffer<float> waveForm;
-    //SampleHolder* holder;
-    foleys::WaveformHolder* audioThumbnail = nullptr;
-
-    juce::AudioThumbnailCache thumbnailCache { 64 };
-
-    foleys::MagicLevelSource* outputMeter  = nullptr;
-
-    //==============================================================================
-    // GUI functions
-    //==============================================================================
+    void setupProcessor();
+    void setReferenceValues();
+    void registerEventTriggers();
     void generateSampleFromPrompt();
     void refresh() const;
     void startServer();
     void initModel() const;
 
-
-
-
-    //==============================================================================
-    // Other private methods
-    //==============================================================================
-    void setupProcessor();
-    void setReferenceValues();
-    void registerEventTriggers();
-
-
-    //==============================================================================
-    // Private member variables
-    //==============================================================================
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-    juce::Value promptValue { AudioPluginConstants::initialPromptFieldMessage};
-    juce::Value negativePromptValue {AudioPluginConstants::initialNegativePromptFieldMessage};
 
+    juce::AudioProcessorValueTreeState apvts;
+    juce::Synthesiser sampler;
+    juce::AudioFormatManager formatManager;
+    juce::AudioFormatReader* reader = nullptr;
+    juce::AudioBuffer<float> waveForm;
+    foleys::WaveformHolder* audioThumbnail = nullptr;
+    juce::AudioThumbnailCache thumbnailCache{64};
+    foleys::MagicLevelSource* outputMeter = nullptr;
+    juce::Value promptValue{AudioPluginConstants::initialPromptFieldMessage};
+    juce::Value negativePromptValue{AudioPluginConstants::initialNegativePromptFieldMessage};
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)

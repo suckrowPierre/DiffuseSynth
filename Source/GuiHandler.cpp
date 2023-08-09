@@ -5,7 +5,6 @@
 #include "GuiHandler.h"
 #include "PluginProcessor.h"
 #include <juce_gui_basics/juce_gui_basics.h>
-#include "Components/WaveFormDisplay.h"
 
 GuiHandler::GuiHandler(AudioPluginAudioProcessor& processor, foleys::MagicProcessorState& magicState)
         : processor_(processor), magicState_(magicState), guiHelpers_(std::make_unique<GuiHelpers>(magicState))
@@ -31,17 +30,7 @@ juce::ValueTree GuiHandler::getNodeByIdAndLogIfInvalid(const juce::String& nodeI
     return node;
 }
 
-void GuiHandler::drawWaveform(const juce::String &id, const juce::AudioBuffer<float> &buffer) {
-    auto node = getNodeByIdAndLogIfInvalid(id);
 
-    if (!node.isValid())
-        return;
-
-    if(node.isValid()) {
-       // daw a line for a test and put it as a child to the node
-    }
-
-}
 
 
 
