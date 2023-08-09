@@ -133,4 +133,90 @@ void WaveformItem::update()
 
 // ================================================================================
 
+    SpectrogramDisplay::SpectrogramDisplay()
+    {
+        setColour (ColourIds::spectrogramBackgroundColour, juce::Colours::transparentBlack);
+        setColour (ColourIds::spectrogramForegroundColour, juce::Colours::orangered);
+    }
+
+    SpectrogramDisplay::~SpectrogramDisplay()
+    {
+        if (audioThumb)
+            audioThumb->removeChangeListener (this);
+    }
+
+    void SpectrogramDisplay::paint (juce::Graphics& g)
+    {
+        auto background = findColour (ColourIds::spectrogramBackgroundColour);
+        auto foreground = findColour (ColourIds::spectrogramForegroundColour);
+
+        if (!background.isTransparent())
+        {
+            g.fillAll (background);
+        }
+
+        g.setColour (foreground);
+
+        if (file)
+        {
+            g.drawFittedText (TRANS ("spectogram"), getLocalBounds(), juce::Justification::centred, 1);
+            //TODO display spectrogram
+        }
+        else
+            g.drawFittedText (TRANS ("No File"), getLocalBounds(), juce::Justification::centred, 1);
+    }
+
+    void SpectrogramDisplay::setAudioThumbnail (WaveformHolder* thumb)
+    {
+        if (audioThumb)
+            audioThumb->removeChangeListener (this);
+
+        audioThumb = thumb;
+
+        updateAudioFile();
+
+        if (audioThumb)
+            audioThumb->addChangeListener (this);
+    }
+
+    void SpectrogramDisplay::updateAudioFile()
+    {
+        if (!audioThumb)
+        {
+            file.reset();
+            return;
+        }
+
+        if (!audioThumb->getAudioFile().existsAsFile())
+            return;
+        audioThumb->getCache().clear();
+        file = std::make_unique<juce::File>( audioThumb->getAudioFile());
+    }
+
+    void SpectrogramDisplay::changeListenerCallback ([[maybe_unused]] juce::ChangeBroadcaster* sender)
+    {
+        if (sender == audioThumb)
+            updateAudioFile();
+
+        repaint();
+    }
+//=================================================================================================
+
+
+    SpectrogramItem::SpectrogramItem (MagicGUIBuilder& builder, const juce::ValueTree& node) : GuiItem (builder, node)
+    {
+        setColourTranslation ({ { "spectrogram-background", SpectrogramDisplay::ColourIds::spectrogramBackgroundColour },
+                                { "spectrogram-colour", SpectrogramDisplay::ColourIds::spectrogramForegroundColour } });
+
+        addAndMakeVisible (spectrogramDisplay);
+    }
+
+    void SpectrogramItem::update()
+    {
+        auto& state          = getMagicState();
+        auto* audioThumbnail = state.getObjectWithType<WaveformHolder> ("Waveform");
+
+        spectrogramDisplay.setAudioThumbnail (audioThumbnail);
+    }
+
 }  // namespace foleys

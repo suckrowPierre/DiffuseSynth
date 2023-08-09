@@ -64,7 +64,8 @@ void AudioPluginAudioProcessor::initialiseBuilder (foleys::MagicGUIBuilder& buil
     builder.registerJUCELookAndFeels();
 
     //builder.registerFactory ("WaveFormDisplay", &WaveFormDisplayItem::factory);
-    builder.registerFactory("Waveform", &foleys::WaveformItem::factory);
+    builder.registerFactory("WaveformDisplay", &foleys::WaveformItem::factory);
+    builder.registerFactory("SpectrogramDisplay", &foleys::SpectrogramItem::factory);
 
 
 

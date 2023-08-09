@@ -104,5 +104,47 @@ private:
 };
 
 // ================================================================================
+class SpectrogramDisplay
+  : public juce::Component
+  , juce::ChangeListener {
+    public:
+    enum ColourIds {
+        spectrogramBackgroundColour = 0x2002020,
+        spectrogramForegroundColour
+    };
+
+    SpectrogramDisplay();
+    ~SpectrogramDisplay() override;
+
+    void paint(juce::Graphics& g) override;
+
+    void setAudioThumbnail (WaveformHolder* thumb);
+    void updateAudioFile();
+
+    void changeListenerCallback([[maybe_unused]] juce::ChangeBroadcaster* sender) override;
+
+private:
+    WaveformHolder*                       audioThumb = nullptr;
+    std::unique_ptr<juce::File> file;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrogramDisplay)
+};
+
+
+class SpectrogramItem : public GuiItem {
+public:
+    SpectrogramItem(MagicGUIBuilder &builder, const juce::ValueTree &node);
+
+    void update() override;
+
+    juce::Component *getWrappedComponent() override { return &spectrogramDisplay; }
+    FOLEYS_DECLARE_GUI_FACTORY (SpectrogramItem)
+
+private:
+    SpectrogramDisplay spectrogramDisplay;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrogramItem)
+
+};
 
 }  // namespace foleys
