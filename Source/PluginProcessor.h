@@ -3,7 +3,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "../Modules/foleys_gui_magic/foleys_gui_magic.h"
 #include "Util/Constants.h"
-#include "GuiHandler.h"
+#include "Util/GuiHandler.h"
 #include "Api//ApiHandler.h"
 #include "Components/SampleHolder.h"
 #include "Components/SampleHolder.h"

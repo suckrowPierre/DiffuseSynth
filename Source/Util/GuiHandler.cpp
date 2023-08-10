@@ -3,8 +3,8 @@
 //
 
 #include "GuiHandler.h"
-#include "PluginProcessor.h"
-#include <juce_gui_basics/juce_gui_basics.h>
+#include "../PluginProcessor.h"
+#include "juce_gui_basics/juce_gui_basics.h"
 
 GuiHandler::GuiHandler(AudioPluginAudioProcessor& processor, foleys::MagicProcessorState& magicState)
         : processor_(processor), magicState_(magicState), guiHelpers_(std::make_unique<GuiHelpers>(magicState))

@@ -1,6 +1,6 @@
 #include "PluginProcessor.h"
 #include "BinaryData.h"
-#include "GuiHandler.h"
+#include "Util/GuiHandler.h"
 #include "Util/Logger.h"
 
 void AudioPluginAudioProcessor::addChoiceParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {

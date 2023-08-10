@@ -92,11 +92,10 @@ juce_add_plugin(DiffuseSynth
 target_sources(DiffuseSynth
     PRIVATE
         Source/PluginProcessor.cpp
-        Source/LocalizationManager.cpp
         Source/Api/AudioLDMApiClient.cpp
         Source/Util/Logger.cpp
         Source/Util/Constants.h
-        Source/GuiHandler.cpp
+        Source/Util/GuiHandler.cpp
         Source/Api/ApiHandler.cpp
         Source/Util/GuiHelpers.cpp
         Source/Components/SampleHolder.cpp
