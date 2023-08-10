@@ -2,11 +2,11 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "../Modules/foleys_gui_magic/foleys_gui_magic.h"
-#include "Constants.h"
+#include "Util/Constants.h"
 #include "GuiHandler.h"
 #include "Api//ApiHandler.h"
 #include "Components/SampleHolder.h"
-#include "Waveform.h"
+#include "Components/SampleHolder.h"
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public foleys::MagicProcessor
@@ -71,7 +71,7 @@ private:
     juce::AudioFormatManager formatManager;
     juce::AudioFormatReader* reader = nullptr;
     juce::AudioBuffer<float> waveForm;
-    foleys::WaveformHolder* audioThumbnail = nullptr;
+    foleys::SampleHolder* audioThumbnail = nullptr;
     juce::AudioThumbnailCache thumbnailCache{64};
     foleys::MagicLevelSource* outputMeter = nullptr;
     juce::Value promptValue{AudioPluginConstants::initialPromptFieldMessage};

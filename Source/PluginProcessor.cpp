@@ -42,7 +42,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 
     outputMeter = magicState.createAndAddObject<foleys::MagicLevelSource>("output");
     formatManager.registerBasicFormats();
-    audioThumbnail = magicState.createAndAddObject<foleys::WaveformHolder>("Waveform", thumbnailCache, formatManager);
+    audioThumbnail = magicState.createAndAddObject<foleys::SampleHolder>("Waveform", thumbnailCache, formatManager);
     apiHandler = std::make_unique<ApiHandler>(*this);
     guiHandler = std::make_unique<GuiHandler>(*this, magicState);
     setupProcessor();
@@ -93,7 +93,7 @@ void AudioPluginAudioProcessor::loadFile(){
             waveForm.setSize(1, sampleLength);
             readerPtr->read(&waveForm, 0, sampleLength, 0, true, true);
 
-            audioThumbnail->setAudioFile(file);
+            audioThumbnail->setAudioFileAndBuffer(file, &waveForm);
 
             sampler.addSound(new juce::SamplerSound("sample", *readerPtr, range, 60, 0, 0.1, 10.0));
         }

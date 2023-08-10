@@ -95,14 +95,12 @@ target_sources(DiffuseSynth
         Source/LocalizationManager.cpp
         Source/Api/AudioLDMApiClient.cpp
         Source/Util/Logger.cpp
-        Source/Constants.h
+        Source/Util/Constants.h
         Source/GuiHandler.cpp
         Source/Api/ApiHandler.cpp
         Source/Util/GuiHelpers.cpp
-        Source/Components/WaveFormDisplay.cpp
         Source/Components/SampleHolder.cpp
         Modules/foleys_gui_magic/foleys_gui_magic.cpp
-        Source/Waveform.cpp
         )
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
