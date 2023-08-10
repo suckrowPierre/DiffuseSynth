@@ -80,9 +80,18 @@ private:
     foleys::MagicLevelSource* outputMeter = nullptr;
     juce::Value promptValue{AudioPluginConstants::initialPromptFieldMessage};
     juce::Value negativePromptValue{AudioPluginConstants::initialNegativePromptFieldMessage};
+    static void addFloatParameter(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters,
+                                  const std::string& id, const std::string& name,
+                                  float min, float max, float defaultVal);
+    void addParameterListener(const std::string& paramId);
+    juce::RangedAudioParameter* getParameter(const std::string& paramId);
     void updateADSRParameters();
     void fetchADSRParameters();
 
+    static void addChoiceParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters);
+    static void addIntParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters);
+    static void addBoolParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters);
+    static void addFloatParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 

@@ -3,29 +3,44 @@
 #include "GuiHandler.h"
 #include "Util/Logger.h"
 
+void AudioPluginAudioProcessor::addChoiceParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
+    parameters.push_back(std::make_unique<juce::AudioParameterChoice>("DEVICES", "Devices", AudioPluginConstants::devices, 0));
+    parameters.push_back(std::make_unique<juce::AudioParameterChoice>("MODELS", "Models", AudioPluginConstants::models, 0));
+}
+
+void AudioPluginAudioProcessor::addIntParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
+    parameters.push_back(std::make_unique<juce::AudioParameterInt>("PORT", "Port", 0, 65535, 8000));
+    parameters.push_back(std::make_unique<juce::AudioParameterInt>("NUM_INFERENCE_STEPS", "Number of Inference Steps", 5, 20, AudioPluginConstants::initialNumInference));
+}
+
+void AudioPluginAudioProcessor::addBoolParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
+    parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_START_SERVER", "Auto Start Server", AudioPluginConstants::initialAutoStartServer));
+    parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_SETUP_MODEL", "Auto Setup Model", AudioPluginConstants::initialAutoModelSetup));
+}
+
+void AudioPluginAudioProcessor::addFloatParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
+    addFloatParameter(parameters, "AUDIO_LENGTH", "Audio Length", 1.0f, 30.0f, AudioPluginConstants::initialAudioLength);
+    addFloatParameter(parameters, "GUIDANCE_SCALE", "Guidance Scale", 1.0f, 5.0f,
+                      AudioPluginConstants::initialGuidanceScale);
+    addFloatParameter(parameters, "PITCH", "Pitch", AudioPluginConstants::minPitch, AudioPluginConstants::maxPitch, 0);
+    addFloatParameter(parameters, "ATTACK_", "Attack", AudioPluginConstants::minAttack, AudioPluginConstants::maxAttack,
+                      AudioPluginConstants::defaultAttack);
+    addFloatParameter(parameters, "DECAY_", "Decay", AudioPluginConstants::minDecay, AudioPluginConstants::maxDecay,
+                      AudioPluginConstants::defaultDecay);
+    addFloatParameter(parameters, "SUSTAIN_", "Sustain", AudioPluginConstants::minSustain,
+                      AudioPluginConstants::maxSustain, AudioPluginConstants::defaultSustain);
+    addFloatParameter(parameters, "RELEASE_", "Release", AudioPluginConstants::minRelease,
+                      AudioPluginConstants::maxRelease, AudioPluginConstants::defaultRelease);
+    addFloatParameter(parameters, "GAIN", "Gain", AudioPluginConstants::minGain, AudioPluginConstants::maxGain, 0.7f);
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout()
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
-
-    parameters.push_back(std::make_unique<juce::AudioParameterChoice>("DEVICES", "Devices", AudioPluginConstants::devices, 0));
-    parameters.push_back(std::make_unique<juce::AudioParameterChoice>("MODELS", "Models", AudioPluginConstants::models, 0));
-    parameters.push_back(std::make_unique<juce::AudioParameterInt>("PORT", "Port", 0, 65535, 8000));
-    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("AUDIO_LENGTH", "Audio Length", 1.0f, 30.0f, AudioPluginConstants::initialAudioLength));
-    parameters.push_back(std::make_unique<juce::AudioParameterInt>("NUM_INFERENCE_STEPS", "Number of Inference Steps", 5,20, AudioPluginConstants::initialNumInference));
-    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("GUIDANCE_SCALE", "Guidance Scale", 1.0f, 5.0f, AudioPluginConstants::initialGuidanceScale));
-    parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_START_SERVER", "Auto Start Server", AudioPluginConstants::initialAutoStartServer));
-    parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_SETUP_MODEL", "Auto Setup Model", AudioPluginConstants::initialAutoModelSetup));
-    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("PITCH", "Pitch", AudioPluginConstants::minPitch, AudioPluginConstants::maxPitch,0));
-
-
-    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("ATTACK_", "Attack", AudioPluginConstants::minAttack, AudioPluginConstants::maxAttack,AudioPluginConstants::defaultAttack));
-    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY_", "Decay", AudioPluginConstants::minDecay, AudioPluginConstants::maxDecay,AudioPluginConstants::defaultDecay));
-    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("SUSTAIN_", "Sustain", AudioPluginConstants::minSustain, AudioPluginConstants::maxSustain, AudioPluginConstants::defaultSustain));
-    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE_", "Release", AudioPluginConstants::minRelease, AudioPluginConstants::maxRelease, AudioPluginConstants::defaultRelease));
-
-    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("GAIN", "Gain", AudioPluginConstants::minGain, AudioPluginConstants::maxGain, 0.7));
-
-
+    addChoiceParameters(parameters);
+    addIntParameters(parameters);
+    addBoolParameters(parameters);
+    addFloatParameters(parameters);
     return { parameters.begin(), parameters.end() };
 }
 
@@ -65,34 +80,43 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 }
 
 void AudioPluginAudioProcessor::addParamListeners() {
-    auto attack = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter ("ATTACK_"));
-    jassert (attack);
-    attack->addListener(this);
-    ParameterIndexMap["ATTACK_"] = attack->getParameterIndex();
-
-    auto decay = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter ("DECAY_"));
-    jassert (decay);
-    decay->addListener(this);
-    ParameterIndexMap["DECAY_"] = decay->getParameterIndex();
-
-    auto sustain = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter ("SUSTAIN_"));
-    jassert (sustain);
-    sustain->addListener(this);
-    ParameterIndexMap["SUSTAIN_"] = sustain->getParameterIndex();
-
-    auto release = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter ("RELEASE_"));
-    jassert (release);
-    release->addListener(this);
-    ParameterIndexMap["RELEASE_"] = release->getParameterIndex();
+    addParameterListener("ATTACK_");
+    addParameterListener("DECAY_");
+    addParameterListener("SUSTAIN_");
+    addParameterListener("RELEASE_");
+    addParameterListener("GAIN");
+    addParameterListener("PITCH");
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
         reader = nullptr;
 }
 
+void AudioPluginAudioProcessor::addFloatParameter(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters,
+                                             const std::string& id, const std::string& name,
+                                             float min, float max, float defaultVal) {
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>(id, name, min, max, defaultVal));
+}
+
+void AudioPluginAudioProcessor::addParameterListener(const std::string& paramId) {
+    auto param = getParameter(paramId);
+    param->addListener(this);
+    ParameterIndexMap[paramId] = param->getParameterIndex();
+}
+
+juce::RangedAudioParameter* AudioPluginAudioProcessor::getParameter(const std::string& paramId) {
+    auto param = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter(paramId));
+    jassert(param);
+    return param;
+}
+
 void AudioPluginAudioProcessor::parameterValueChanged (int parameterIndex, float newValue){
     if(parameterIndex == ParameterIndexMap["ATTACK_"] || parameterIndex == ParameterIndexMap["DECAY_"] || parameterIndex == ParameterIndexMap["SUSTAIN_"] || parameterIndex == ParameterIndexMap["RELEASE_"]) {
         updateADSRParameters();
+    } else if(parameterIndex == ParameterIndexMap["GAIN"]) {
+        //TODO
+    } else if(parameterIndex == ParameterIndexMap["PITCH"]) {
+        //TODO update pitch
     }
 }
 
@@ -128,7 +152,6 @@ void AudioPluginAudioProcessor::initialiseBuilder (foleys::MagicGUIBuilder& buil
     builder.registerJUCEFactories();
     builder.registerJUCELookAndFeels();
 
-    //builder.registerFactory ("WaveFormDisplay", &WaveFormDisplayItem::factory);
     builder.registerFactory("WaveformDisplay", &foleys::WaveformItem::factory);
     builder.registerFactory("SpectrogramDisplay", &foleys::SpectrogramItem::factory);
 
@@ -140,7 +163,6 @@ void AudioPluginAudioProcessor::initialiseBuilder (foleys::MagicGUIBuilder& buil
 void AudioPluginAudioProcessor::loadFile(){
     Logger::logInfo("Loading file");
 
-    // Use File::getSpecialLocation to access the temp directory
     juce::File file(juce::File::getSpecialLocation(juce::File::SpecialLocationType::tempDirectory)
                             .getChildFile(AudioPluginConstants::tempFileName));
     Logger::logInfo("path: " + file.getFullPathName());
