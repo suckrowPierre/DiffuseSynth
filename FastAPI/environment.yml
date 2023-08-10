@@ -14,3 +14,7 @@ dependencies:
       - pydantic
       - accelerate
       - soundfile
+      - librosa
+      - numpy
+      - matplotlib
+      - librosa

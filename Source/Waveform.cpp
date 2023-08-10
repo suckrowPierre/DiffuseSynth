@@ -137,6 +137,18 @@ void WaveformItem::update()
     {
         setColour (ColourIds::spectrogramBackgroundColour, juce::Colours::transparentBlack);
         setColour (ColourIds::spectrogramForegroundColour, juce::Colours::orangered);
+
+        spectrogramGradient.addColour(0.0, juce::Colours::black);
+        spectrogramGradient.addColour(0.125, juce::Colour(27,10,66) );
+        spectrogramGradient.addColour(0.25, juce::Colour(71,23,116) );
+        spectrogramGradient.addColour(0.375, juce::Colour(96,36,100) );
+        spectrogramGradient.addColour(0.5, juce::Colour(133,51,96) );
+        spectrogramGradient.addColour(0.625, juce::Colour(209,90,100) );
+        spectrogramGradient.addColour(0.75, juce::Colour(236,141,106) );
+        spectrogramGradient.addColour(0.875, juce::Colour(245,196,143) );
+        spectrogramGradient.addColour(1, juce::Colour(253,254,198) );
+
+
     }
 
     SpectrogramDisplay::~SpectrogramDisplay()
@@ -159,8 +171,7 @@ void WaveformItem::update()
 
         if (file)
         {
-            g.drawFittedText (TRANS ("spectogram"), getLocalBounds(), juce::Justification::centred, 1);
-            //TODO display spectrogram
+                g.drawImageAt(spectrogramImage, 0, 0);
         }
         else
             g.drawFittedText (TRANS ("No File"), getLocalBounds(), juce::Justification::centred, 1);
@@ -191,6 +202,66 @@ void WaveformItem::update()
             return;
         audioThumb->getCache().clear();
         file = std::make_unique<juce::File>( audioThumb->getAudioFile());
+
+        std::unique_ptr<juce::AudioFormatReader> reader (audioThumb->getManager().createReaderFor(audioThumb->getAudioFile()));
+        if (reader)
+        {
+            auto sampleLength = static_cast<int>(reader->lengthInSamples);
+            audioBuffer.setSize(1, sampleLength);
+            reader->read (&audioBuffer, 0, sampleLength, 0, true, true);
+        }
+
+        forwardFFT = std::make_unique<juce::dsp::FFT>(fftOrder);
+
+        updateSpectrogram();
+    }
+
+    void SpectrogramDisplay::updateSpectrogram()
+    {
+        spectrogramImage = juce::Image(juce::Image::RGB, getLocalBounds().getWidth(), getLocalBounds().getHeight(), true);
+        currentX = 0;
+
+        const int numChannels = audioBuffer.getNumChannels();
+        const int numSamples = audioBuffer.getNumSamples();
+        const int spectrogramWidth = getLocalBounds().getWidth();
+        const int spectrogramHeight = getLocalBounds().getHeight();
+
+        const int columnsPerFFT = spectrogramWidth / (numSamples / fftSize);
+
+        for (int channel = 0; channel < numChannels; ++channel)
+        {
+            const float* channelData = audioBuffer.getReadPointer(channel);
+
+            for (int i = 0; i < numSamples; i += fftSize)
+            {
+                for (int j = 0; j < fftSize; ++j)
+                {
+                    fftData[j] = (i + j < numSamples) ? channelData[i + j] : 0.f;
+                }
+
+                forwardFFT->performFrequencyOnlyForwardTransform(fftData.data());
+
+                auto maxLevel = juce::FloatVectorOperations::findMinAndMax(fftData.data(), fftSize / 2);
+
+                for (int x = 0; x < columnsPerFFT; ++x)
+                {
+                    for (int y = 0; y < spectrogramHeight; ++y)
+                    {
+                        auto skewedProportionY = 1.0f - std::exp(std::log(float(y) / float(spectrogramHeight)) * 0.2f);
+                        auto fftDataIndex = (size_t)juce::jlimit(0, fftSize / 2, int(skewedProportionY * fftSize / 2));
+                        auto level = juce::jmap(fftData[fftDataIndex], 0.0f, juce::jmax(maxLevel.getEnd(), 1e-5f)/3, 0.0f, 1.0f);
+
+
+                        juce::Colour color = spectrogramGradient.getColourAtPosition(level);
+                        spectrogramImage.setPixelAt(currentX, y, color);
+                    }
+
+                    currentX++;
+                }
+            }
+        }
+
+        repaint();
     }
 
     void SpectrogramDisplay::changeListenerCallback ([[maybe_unused]] juce::ChangeBroadcaster* sender)

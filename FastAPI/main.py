@@ -6,6 +6,11 @@ import base64
 import io
 import soundfile as sf
 from enum import Enum
+import numpy as np
+import matplotlib.pyplot as plt
+import librosa
+import librosa.display
+
 
 app = FastAPI()
 pipe = None
@@ -40,6 +45,14 @@ def is_repo_id_valid(repo_id):
 def is_device_valid(device):
     return device in Devices._value2member_map_
 
+def plot_melspectrogram(waveform, sr, n_fft=2048, hop_length=512, n_mels=128):
+    plt.figure(figsize=(11, 8))
+    S = librosa.feature.melspectrogram(y=waveform, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mels=n_mels)
+    S_DB = librosa.amplitude_to_db(S, ref=np.max)
+    librosa.display.specshow(S_DB, sr=sr, hop_length=hop_length, x_axis='time', y_axis='mel')
+    plt.colorbar(format='%+2.0f dB')
+    plt.tight_layout()
+    plt.savefig('test.png', dpi=300)
 
 class GenerateParams(BaseModel):
     prompt: str
@@ -128,16 +141,13 @@ async def get_current_model_and_device():
     return {"device": audio_model.device, "model": audio_model.repo_id}
 
 
-
-
-
-
 @app.post("/generate")
 async def generate(params: GenerateParams):
     global audio_model
     if audio_model is None:
         raise HTTPException(status_code=400, detail="Model is not set up. Please POST to /setup first.")
     audio = audio_model.generate(params)
+    plot_melspectrogram(audio, 44100)
 
     with io.BytesIO() as audio_io:
         sf.write(audio_io, audio, samplerate=44100, format='WAV')

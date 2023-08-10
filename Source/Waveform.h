@@ -120,12 +120,27 @@ class SpectrogramDisplay
 
     void setAudioThumbnail (WaveformHolder* thumb);
     void updateAudioFile();
+    void updateSpectrogram();
 
     void changeListenerCallback([[maybe_unused]] juce::ChangeBroadcaster* sender) override;
 
 private:
     WaveformHolder*                       audioThumb = nullptr;
     std::unique_ptr<juce::File> file;
+    juce::AudioBuffer<float> audioBuffer; // Buffer to hold audio data
+
+    static constexpr auto fftOrder = 10;
+    static constexpr auto fftSize  = 1 << fftOrder;
+    int currentX = 0;
+
+    std::array<float, fftSize> fifo;
+    std::array<float, fftSize * 2> fftData;
+
+
+    std::unique_ptr<juce::dsp::FFT> forwardFFT;       // FFT object to perform the transform
+    juce::Image spectrogramImage;         // Image to draw the spectrogram
+
+    juce::ColourGradient spectrogramGradient;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrogramDisplay)
 };
