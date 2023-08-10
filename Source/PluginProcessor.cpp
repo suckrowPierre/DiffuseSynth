@@ -17,6 +17,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
     parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_SETUP_MODEL", "Auto Setup Model", AudioPluginConstants::initialAutoModelSetup));
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>("PITCH", "Pitch", AudioPluginConstants::minPitch, AudioPluginConstants::maxPitch,0));
 
+
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("ATTACK_", "Attack", AudioPluginConstants::minAttack, AudioPluginConstants::maxAttack,AudioPluginConstants::defaultAttack));
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY_", "Decay", AudioPluginConstants::minDecay, AudioPluginConstants::maxDecay,AudioPluginConstants::defaultDecay));
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("SUSTAIN_", "Sustain", AudioPluginConstants::minSustain, AudioPluginConstants::maxSustain, AudioPluginConstants::defaultSustain));
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE_", "Release", AudioPluginConstants::minRelease, AudioPluginConstants::maxRelease, AudioPluginConstants::defaultRelease));
+
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("GAIN", "Gain", AudioPluginConstants::minGain, AudioPluginConstants::maxGain, 0.7));
+
+
     return { parameters.begin(), parameters.end() };
 }
 
@@ -40,6 +49,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     magicState.getPropertyAsValue ("auto_setup").setValue( AudioPluginConstants::initialAutoModelSetup);
     magicState.getPropertyAsValue ("auto_start").setValue(AudioPluginConstants::initialAutoStartServer);
 
+
     outputMeter = magicState.createAndAddObject<foleys::MagicLevelSource>("output");
     formatManager.registerBasicFormats();
     audioThumbnail = magicState.createAndAddObject<foleys::SampleHolder>("Waveform", thumbnailCache, formatManager);
@@ -50,10 +60,65 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     for(int i = 0; i < AudioPluginConstants::numVoices; i++) {
         sampler.addVoice(new juce::SamplerVoice());
     }
+
+    addParamListeners();
+}
+
+void AudioPluginAudioProcessor::addParamListeners() {
+    auto attack = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter ("ATTACK_"));
+    jassert (attack);
+    attack->addListener(this);
+    ParameterIndexMap["ATTACK_"] = attack->getParameterIndex();
+
+    auto decay = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter ("DECAY_"));
+    jassert (decay);
+    decay->addListener(this);
+    ParameterIndexMap["DECAY_"] = decay->getParameterIndex();
+
+    auto sustain = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter ("SUSTAIN_"));
+    jassert (sustain);
+    sustain->addListener(this);
+    ParameterIndexMap["SUSTAIN_"] = sustain->getParameterIndex();
+
+    auto release = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter ("RELEASE_"));
+    jassert (release);
+    release->addListener(this);
+    ParameterIndexMap["RELEASE_"] = release->getParameterIndex();
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
         reader = nullptr;
+}
+
+void AudioPluginAudioProcessor::parameterValueChanged (int parameterIndex, float newValue){
+    if(parameterIndex == ParameterIndexMap["ATTACK_"] || parameterIndex == ParameterIndexMap["DECAY_"] || parameterIndex == ParameterIndexMap["SUSTAIN_"] || parameterIndex == ParameterIndexMap["RELEASE_"]) {
+        updateADSRParameters();
+    }
+}
+
+void AudioPluginAudioProcessor::parameterGestureChanged (int parameterIndex, bool gestureIsStarting){
+}
+
+void AudioPluginAudioProcessor::fetchADSRParameters(){
+    ADSRParameters.attack = apvts.getRawParameterValue("ATTACK_")->load();
+    ADSRParameters.decay = apvts.getRawParameterValue("DECAY_")->load();
+    ADSRParameters.sustain = apvts.getRawParameterValue("SUSTAIN_")->load();
+    ADSRParameters.release = apvts.getRawParameterValue("RELEASE_")->load();
+}
+
+void AudioPluginAudioProcessor::updateADSRParameters() {
+    fetchADSRParameters();
+    std::cout << "Attack: " << ADSRParameters.attack << std::endl;
+    std::cout << "Decay: " << ADSRParameters.decay << std::endl;
+    std::cout << "Sustain: " << ADSRParameters.sustain << std::endl;
+    std::cout << "Release: " << ADSRParameters.release << std::endl;
+
+    for(int i = 0; i < sampler.getNumSounds(); i++) {
+        auto* sound = dynamic_cast<juce::SamplerSound*>(sampler.getSound(i).get());
+        if(sound) {;
+            sound->setEnvelopeParameters(ADSRParameters);
+        }
+    }
 }
 
 
@@ -96,6 +161,7 @@ void AudioPluginAudioProcessor::loadFile(){
             audioThumbnail->setAudioFileAndBuffer(file, &waveForm);
 
             sampler.addSound(new juce::SamplerSound("sample", *readerPtr, range, 60, 0, 0.1, 10.0));
+            updateADSRParameters();
         }
         else
         {
@@ -135,6 +201,7 @@ void AudioPluginAudioProcessor::refresh() const
     Logger::logInfo("Refresh");
     apiHandler->fetchStatusAndParameters();
 }
+
 bool AudioPluginAudioProcessor::isAutoStartServer() {
     bool val =  magicState.getPropertyAsValue("auto_start").getValue();
     if(val) return true;
@@ -256,6 +323,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     outputMeter->setupSource(getTotalNumOutputChannels(), sampleRate, AudioPluginConstants::maxKeepMS);
     //magicState.prepareToPlay(sampleRate, samplesPerBlock);
 
+    updateADSRParameters();
 }
 
 void AudioPluginAudioProcessor::releaseResources()

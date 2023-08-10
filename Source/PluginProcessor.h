@@ -9,7 +9,7 @@
 #include "Components/SampleHolder.h"
 
 //==============================================================================
-class AudioPluginAudioProcessor  : public foleys::MagicProcessor
+class AudioPluginAudioProcessor  : public foleys::MagicProcessor, public juce::AudioParameterFloat::Listener
 {
 public:
     AudioPluginAudioProcessor();
@@ -19,6 +19,8 @@ public:
     std::unique_ptr<ApiHandler> apiHandler;
     std::unique_ptr<GuiHandler> guiHandler;
 
+    void parameterValueChanged (int parameterIndex, float newValue) override;
+    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
     //==============================================================================
     // AudioProcessor overrides
     //==============================================================================
@@ -53,6 +55,7 @@ public:
     bool isAutoModelSetup();
     int getPort() const;
 
+    std::map<juce::String, int> ParameterIndexMap;
 private:
 
     void loadFile();
@@ -63,6 +66,7 @@ private:
     void refresh() const;
     void startServer();
     void initModel() const;
+    juce::ADSR::Parameters ADSRParameters;
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
@@ -76,7 +80,11 @@ private:
     foleys::MagicLevelSource* outputMeter = nullptr;
     juce::Value promptValue{AudioPluginConstants::initialPromptFieldMessage};
     juce::Value negativePromptValue{AudioPluginConstants::initialNegativePromptFieldMessage};
+    void updateADSRParameters();
+    void fetchADSRParameters();
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
+
+    void addParamListeners();
 };

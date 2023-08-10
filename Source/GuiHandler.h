@@ -18,11 +18,12 @@ public:
     GuiHandler(AudioPluginAudioProcessor& processor, foleys::MagicProcessorState& magicState);
 
     void updateGUIStatus(const juce::String& id, const juce::String& colour);
+    juce::ValueTree getNodeByIdAndLogIfInvalid(const juce::String& nodeId);
 
    // juce::String getCurrentComboBoxValue(const juce::String& id);
 
 private:
-    juce::ValueTree getNodeByIdAndLogIfInvalid(const juce::String& nodeId);
+
 
     AudioPluginAudioProcessor& processor_;
     foleys::MagicProcessorState& magicState_;
