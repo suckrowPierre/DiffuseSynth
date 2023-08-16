@@ -11,11 +11,12 @@ void AudioPluginAudioProcessor::addChoiceParameters(std::vector<std::unique_ptr<
 void AudioPluginAudioProcessor::addIntParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
     parameters.push_back(std::make_unique<juce::AudioParameterInt>("PORT", "Port", 0, 65535, 8000));
     parameters.push_back(std::make_unique<juce::AudioParameterInt>("NUM_INFERENCE_STEPS", "Number of Inference Steps", 5, 20, AudioPluginConstants::initialNumInference));
+    parameters.push_back(std::make_unique<juce::AudioParameterInt>("SAMPLE_RATE", "Sample Rate", AudioPluginConstants::minSampleRate,
+                      AudioPluginConstants::maxSampleRate, AudioPluginConstants::defaultSampleRate));
 }
 
 void AudioPluginAudioProcessor::addBoolParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
     parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_START_SERVER", "Auto Start Server", AudioPluginConstants::initialAutoStartServer));
-    parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_SETUP_MODEL", "Auto Setup Model", AudioPluginConstants::initialAutoModelSetup));
 }
 
 void AudioPluginAudioProcessor::addFloatParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
@@ -32,14 +33,22 @@ void AudioPluginAudioProcessor::addFloatParameters(std::vector<std::unique_ptr<j
     addFloatParameter(parameters, "RELEASE_", "Release", AudioPluginConstants::minRelease,
                       AudioPluginConstants::maxRelease, AudioPluginConstants::defaultRelease);
     addFloatParameter(parameters, "GAIN", "Gain", AudioPluginConstants::minGain, AudioPluginConstants::maxGain, 0.7f);
+
+    addFloatParameter(parameters, "SAMPLE_RATE", "Sample Rate", AudioPluginConstants::minSampleRate,
+                      AudioPluginConstants::maxSampleRate, AudioPluginConstants::defaultSampleRate);
+    addFloatParameter(parameters, "STEREO_WIDTH", "Stereo Width", AudioPluginConstants::minStereoWidth,
+                      AudioPluginConstants::maxStereoWidth, AudioPluginConstants::defaultStereoWidth);
+    addFloatParameter(parameters, "SIMULATE_HIGHEND" , "Simulate Highend", AudioPluginConstants::minSimulateHighEnd,
+                      AudioPluginConstants::maxSimulateHighEnd, AudioPluginConstants::defaultSimulateHighEnd);
+
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout()
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
+    addBoolParameters(parameters);
     addChoiceParameters(parameters);
     addIntParameters(parameters);
-    addBoolParameters(parameters);
     addFloatParameters(parameters);
     return { parameters.begin(), parameters.end() };
 }
@@ -63,6 +72,9 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     magicState.getPropertyAsValue ("negative_prompt").setValue(AudioPluginConstants::initialNegativePromptFieldMessage);
     magicState.getPropertyAsValue ("auto_setup").setValue( AudioPluginConstants::initialAutoModelSetup);
     magicState.getPropertyAsValue ("auto_start").setValue(AudioPluginConstants::initialAutoStartServer);
+    magicState.getPropertyAsValue ("convertTo44kHz").setValue(AudioPluginConstants::initialConvertTo44kHz);
+    magicState.getPropertyAsValue ("centerLowEnd").setValue(AudioPluginConstants::initialCenterLowEnd);
+
 
 
     outputMeter = magicState.createAndAddObject<foleys::MagicLevelSource>("output");
@@ -84,12 +96,14 @@ void AudioPluginAudioProcessor::addParamListeners() {
     addParameterListener("DECAY_");
     addParameterListener("SUSTAIN_");
     addParameterListener("RELEASE_");
-    addParameterListener("GAIN");
     addParameterListener("PITCH");
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
         reader = nullptr;
+        juce::File file(juce::File::getSpecialLocation(juce::File::SpecialLocationType::tempDirectory)
+                            .getChildFile(AudioPluginConstants::tempFileName));
+        file.deleteFile();
 }
 
 void AudioPluginAudioProcessor::addFloatParameter(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters,
@@ -113,10 +127,8 @@ juce::RangedAudioParameter* AudioPluginAudioProcessor::getParameter(const std::s
 void AudioPluginAudioProcessor::parameterValueChanged (int parameterIndex, float newValue){
     if(parameterIndex == ParameterIndexMap["ATTACK_"] || parameterIndex == ParameterIndexMap["DECAY_"] || parameterIndex == ParameterIndexMap["SUSTAIN_"] || parameterIndex == ParameterIndexMap["RELEASE_"]) {
         updateADSRParameters();
-    } else if(parameterIndex == ParameterIndexMap["GAIN"]) {
-        //TODO
     } else if(parameterIndex == ParameterIndexMap["PITCH"]) {
-        //TODO update pitch
+
     }
 }
 
@@ -165,6 +177,7 @@ void AudioPluginAudioProcessor::loadFile(){
 
     juce::File file(juce::File::getSpecialLocation(juce::File::SpecialLocationType::tempDirectory)
                             .getChildFile(AudioPluginConstants::tempFileName));
+
     Logger::logInfo("path: " + file.getFullPathName());
 
     if (file.existsAsFile())
@@ -234,6 +247,7 @@ bool AudioPluginAudioProcessor::isAutoModelSetup() {
     if(val) return true;
     return false;
 }
+
 void AudioPluginAudioProcessor::startServer() {
     Logger::logInfo("(RE)-Starting server");
     int port = apvts.getParameter("PORT")->getCurrentValueAsText().getIntValue();
@@ -390,8 +404,11 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    sampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
+    sampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    buffer.
+    //update gain
+    buffer.applyGain(apvts.getRawParameterValue("GAIN")->load());
     outputMeter->pushSamples(buffer);
 
 }

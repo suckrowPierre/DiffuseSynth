@@ -17,7 +17,7 @@ namespace AudioPluginConstants
     const juce::StringArray models = {"audioldm-s-full-v2", "audioldm-m-full", "audioldm-l-full"};
     const bool initialAutoStartServer = false;
     const bool initialAutoModelSetup = false;
-    const int numVoices = 3;
+    const int numVoices = 8;
     const juce::String tempFileName = "temp.wav";
     const float maxPitch = 12.0f;
     const float minPitch = -12.0f;
@@ -36,7 +36,19 @@ namespace AudioPluginConstants
     const float maxRelease = 1.0f;
     const float defaultRelease = 0.0f;
     const float minGain = 0.0f;
-    const float maxGain = 1.0f;
+    const float maxGain = 1.5f;
 
+    const float minStereoWidth = 0.0f;
+    const float maxStereoWidth = 1.0f;
+    const float defaultStereoWidth = 0.0f;
+    const float minSimulateHighEnd = 0.0f;
+    const float maxSimulateHighEnd = 1.0f;
+    const float defaultSimulateHighEnd = 0.0f;
 
+    const bool initialConvertTo44kHz = false;
+    const bool initialCenterLowEnd = false;
+
+    const int minSampleRate = 4000;
+    const int maxSampleRate = 48000;
+    const int defaultSampleRate = 16000;
 }

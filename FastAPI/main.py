@@ -15,7 +15,6 @@ import librosa.display
 app = FastAPI()
 pipe = None
 
-
 class Models(Enum):
     # S = "audioldm-s-full"
     SV2 = "audioldm-s-full-v2"
@@ -60,6 +59,10 @@ class GenerateParams(BaseModel):
     audio_length_in_s: float
     num_inference_steps: int
     guidance_scale: float
+    # simulate_high_end: float
+    # convert_to_44khz: bool
+    # center_low_end: bool
+    # sample_rate: int
 
 
 class SetupParams(BaseModel):
@@ -147,10 +150,10 @@ async def generate(params: GenerateParams):
     if audio_model is None:
         raise HTTPException(status_code=400, detail="Model is not set up. Please POST to /setup first.")
     audio = audio_model.generate(params)
-    plot_melspectrogram(audio, 44100)
+    plot_melspectrogram(audio, 16000)
 
     with io.BytesIO() as audio_io:
-        sf.write(audio_io, audio, samplerate=44100, format='WAV')
+        sf.write(audio_io, audio, samplerate=16000, format='WAV')
         audio_bytes = audio_io.getvalue()
 
     # Save the audio to a file
