@@ -33,9 +33,6 @@ void AudioPluginAudioProcessor::addFloatParameters(std::vector<std::unique_ptr<j
     addFloatParameter(parameters, "RELEASE_", "Release", AudioPluginConstants::minRelease,
                       AudioPluginConstants::maxRelease, AudioPluginConstants::defaultRelease);
     addFloatParameter(parameters, "GAIN", "Gain", AudioPluginConstants::minGain, AudioPluginConstants::maxGain, 0.7f);
-
-    addFloatParameter(parameters, "SAMPLE_RATE", "Sample Rate", AudioPluginConstants::minSampleRate,
-                      AudioPluginConstants::maxSampleRate, AudioPluginConstants::defaultSampleRate);
     addFloatParameter(parameters, "STEREO_WIDTH", "Stereo Width", AudioPluginConstants::minStereoWidth,
                       AudioPluginConstants::maxStereoWidth, AudioPluginConstants::defaultStereoWidth);
     addFloatParameter(parameters, "SIMULATE_HIGHEND" , "Simulate Highend", AudioPluginConstants::minSimulateHighEnd,
@@ -283,8 +280,9 @@ void:: AudioPluginAudioProcessor::generateSampleFromPrompt() {
             magicState.getPropertyAsValue("negative_prompt").toString(),
             apvts.getParameter("AUDIO_LENGTH")->getCurrentValueAsText().getFloatValue(),
             apvts.getParameter("NUM_INFERENCE_STEPS")->getCurrentValueAsText().getIntValue(),
-            apvts.getParameter("GUIDANCE_SCALE")->getCurrentValueAsText().getFloatValue()
-    );
+            apvts.getParameter("GUIDANCE_SCALE")->getCurrentValueAsText().getFloatValue(),
+            apvts.getParameter("SAMPLE_RATE")->getCurrentValueAsText().getIntValue()
+            );
     loadFile();
 }
 
@@ -406,7 +404,6 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
 
     sampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-    buffer.
     //update gain
     buffer.applyGain(apvts.getRawParameterValue("GAIN")->load());
     outputMeter->pushSamples(buffer);

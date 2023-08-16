@@ -62,7 +62,7 @@ class GenerateParams(BaseModel):
     # simulate_high_end: float
     # convert_to_44khz: bool
     # center_low_end: bool
-    # sample_rate: int
+    sample_rate: int
 
 
 class SetupParams(BaseModel):
@@ -153,7 +153,7 @@ async def generate(params: GenerateParams):
     plot_melspectrogram(audio, 16000)
 
     with io.BytesIO() as audio_io:
-        sf.write(audio_io, audio, samplerate=16000, format='WAV')
+        sf.write(audio_io, audio, samplerate=params.sample_rate, format='WAV')
         audio_bytes = audio_io.getvalue()
 
     # Save the audio to a file

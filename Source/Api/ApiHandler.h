@@ -17,7 +17,7 @@ public:
     ~ApiHandler() = default;
 
     void initializeApiConnection(bool autoStartServer, bool autoSetupModel);
-    void generateSample(juce::String prompt, juce::String negative_prompt, float audio_length_in_s, int num_inference_steps, float guidance_scale);
+    void generateSample(juce::String prompt, juce::String negative_prompt, float audio_length_in_s, int num_inference_steps, float guidance_scale, int sample_rate);
     void initModel(juce::String device, juce::String repo_id);
     void fetchStatusAndParameters();
     void startServer(int& port);

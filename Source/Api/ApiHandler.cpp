@@ -120,16 +120,16 @@ bool ApiHandler::checkApiStatus()
 }
 
 void ApiHandler::generateSample(juce::String prompt, juce::String negative_prompt, float audio_length_in_s,
-                                int num_inference_steps, float guidance_scale) {
+                                int num_inference_steps, float guidance_scale, int sample_rate) {
     if(!isApiClientInitialized()) {
         return;
     }
 
-    GenerateSampleParameters params{prompt, negative_prompt, audio_length_in_s, num_inference_steps, guidance_scale};
+    GenerateSampleParameters params{prompt, negative_prompt, audio_length_in_s, num_inference_steps, guidance_scale, sample_rate};
 
 
 
-        juce::Logger::writeToLog("Generating sample with parameters: " + params.prompt + ", " + params.negative_prompt + ", " + juce::String(params.audio_length_in_s) + ", " + juce::String(params.num_inference_steps) + ", " + juce::String(params.guidance_scale));
+        juce::Logger::writeToLog("Generating sample with parameters: " + params.prompt + ", " + params.negative_prompt + ", " + juce::String(params.audio_length_in_s) + ", " + juce::String(params.num_inference_steps) + ", " + juce::String(params.guidance_scale) + ", " + juce::String(params.sample_rate));
 
         try {
             if (apiClient->generateSample(params)){

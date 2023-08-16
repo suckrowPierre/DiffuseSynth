@@ -25,6 +25,7 @@ public:
     float audio_length_in_s;
     int num_inference_steps;
     float guidance_scale;
+    int sample_rate;
 };
 
 class AudioLDMApiClient {
