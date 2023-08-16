@@ -67,39 +67,35 @@
             id="Synth" background-color="00000000" lookAndFeel="" flex-direction="column">
         <View border-color="00880202" background-color="FF9B9591">
           <View flex-direction="column" flex-grow="8" background-color="00000000">
+            <Label text="AudioLDM Params" font-size="20" justification="centred"
+                   pos-x="" pos-y="" pos-width="" pos-height="" max-height="40"
+                   margin="0" padding="0" background-color="00000000"/>
             <View flex-direction="column" background-color="00000000">
-              <Label text="AudioLDM Params" font-size="20" justification="centred"
-                     pos-x="" pos-y="" pos-width="" pos-height="" max-height="40"
-                     margin="0" padding="0" background-color="00000000"/>
-              <View flex-direction="row" flex-grow="1.0" margin="0" padding="0" min-height="80"
-                    background-color="00000000">
-                <Label caption="prompt" class="LDMparams" text="" editable="1" value="prompt"
-                       margin="0" padding="0"/>
-                <Label caption="negative_prompt" class="LDMparams" editable="1" value="negative_prompt"
-                       margin="0" padding="0"/>
+              <View flex-direction="row" flex-grow="1.0" margin="0" padding="0" background-color="00000000"
+                    min-height="0.0">
+                <Label caption="prompt" class="LDMparams" text="" editable="1" padding=""
+                       max-height="70" margin="" justification="centred" font-size="15" value="prompt"/>
+                <View border-color="00000000" background-color="00000000" flex-grow="0.3"/>
+                <Label caption="negative_prompt" class="LDMparams" editable="1" padding=""
+                       margin="" font-size="15" justification="centred" value="negative_prompt"/>
+              </View>
+            </View>
+            <View flex-direction="column" background-color="00000000">
+              <View flex-direction="row" margin="0" padding="0" background-color="00000000">
                 <Slider class="LDMparams" caption="audio_length_in_s" parameter="AUDIO_LENGTH"
                         caption-placement="" slider-textbox=""/>
                 <Slider class="LDMparams" caption="num_inference_steps" parameter="NUM_INFERENCE_STEPS"/>
                 <Slider class="LDMparams" caption="guidance_scale" parameter="GUIDANCE_SCALE"/>
-              </View>
-            </View>
-            <View flex-direction="column" background-color="00000000">
-              <Label text="Audio quality enhancements" font-size="20" justification="centred"
-                     pos-x="" pos-y="" pos-width="" pos-height="" margin="0" padding="0"
-                     max-height="40" background-color="00000000"/>
-              <View flex-direction="row" margin="0" padding="0" background-color="00000000">
-                <Slider class="LDMparams" caption="pipeline_sample_rate" parameter="SAMPLE_RATE"/>
-                <ToggleButton text="convert_to_44khz" margin="0" padding="0" property="convertTo44kHz"/>
-                <Slider class="LDMparams" caption="simulate_high_end_rate" parameter="SIMULATE_HIGHEND"/>
-                <ToggleButton text="center_low_end" margin="0" padding="0" property="centerLowEnd"/>
+                <Slider class="LDMparams" caption="pipeline_sample_rate" parameter="SAMPLE_RATE"
+                        accessibility="0" help-text="" title=""/>
               </View>
             </View>
           </View>
           <View display="contents" margin="0" flex-grow="1" background-color="00000000">
             <TextButton onClick="generate" text="generate sample" lookAndFeel="LookAndFeel_V4"
                         flex-grow="1" flex-shrink="1" flex-align-self="center" height=""
-                        max-width="" max-height="" pos-x="" pos-y="30%" pos-height="100"
-                        background-color="00000000"/>
+                        max-width="" max-height="" pos-x="-5" pos-y="28.2051%" pos-height="100"
+                        background-color="00000000" pos-width="100%"/>
           </View>
         </View>
         <View background-color="FF9B9591">

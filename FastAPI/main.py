@@ -153,12 +153,10 @@ async def generate(params: GenerateParams):
     plot_melspectrogram(audio, 16000)
 
     with io.BytesIO() as audio_io:
+        sf.write("output.wav", audio, samplerate=params.sample_rate, format='WAV')
         sf.write(audio_io, audio, samplerate=params.sample_rate, format='WAV')
         audio_bytes = audio_io.getvalue()
 
-    # Save the audio to a file
-    with open('output.wav', 'wb') as f:
-        f.write(audio_bytes)
 
     audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
 
