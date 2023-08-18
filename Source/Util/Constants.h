@@ -24,16 +24,16 @@ namespace AudioPluginConstants
     const int maxKeepMS = 300;
 
     const float minAttack = 0.0f;
-    const float maxAttack = 1.0f;
+    const float maxAttack = 10.0f;
     const float defaultAttack = 0.0f;
     const float minDecay = 0.0f;
-    const float maxDecay = 1.0f;
+    const float maxDecay = 10.0f;
     const float defaultDecay = 0.0f;
     const float minSustain = 0.0f;
-    const float maxSustain = 1.0f;
+    const float maxSustain = 10.0f;
     const float defaultSustain = 1.0f;
     const float minRelease = 0.0f;
-    const float maxRelease = 1.0f;
+    const float maxRelease = 10.0f;
     const float defaultRelease = 0.0f;
     const float minGain = 0.0f;
     const float maxGain = 1.5f;
