@@ -19,21 +19,17 @@ Download the latest stable release from the [releases page](), and follow the in
 ### Source
 If you prefer to run the source code, follow these steps:
 
-1. **Clone the Repository**: You can clone the repository and its submodules using the following command:
-   \```
-   git clone --recurse-submodules <REPOSITORY_URL>
-   \```
-   Or, if cloning normally, initialize and update the submodules with:
-   \```
-   git submodule init
-   git submodule update
-   \```
+1. **Clone the Repository**:
+   - You can clone the repository and its submodules using the following command: `git clone --recurse-submodules <REPOSITORY_URL>`
+   - Or, if cloning normally, initialize and update the submodules with:
+     - `git submodule init`
+     - `git submodule update`
 
-2. **Load the Project**: Open the project via the provided CMake file.
+3. **Load the Project**: Open the project via the provided CMake file.
 
-3. **Configure Run/Debug Settings**: Create a Run/Debug Configuration by choosing one of the executables to run the project.
+4. **Configure Run/Debug Settings**: Create a Run/Debug Configuration by choosing one of the executables to run the project.
 
-4. **Set Up the Server** (without the plugin):
+5. **Set Up the Server** (without the plugin):
    - Update the environment: `conda env update --file environment.yml` (in the FastAPI folder)
    - Activate the environment: `conda activate DiffuseSynthAPI_env`
    - Start the server: `uvicorn main:app --reload`
