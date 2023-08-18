@@ -1,9 +1,0 @@
-{
-  "synth": {
-    "title": "DiffuseSynth",
-    "subtitle": "A synthesizer based on latent diffusion"
-  },
-  "about" : {
-    "author": "Pierre-Louis Suckrow"
-  }
-}

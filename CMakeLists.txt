@@ -134,8 +134,6 @@ target_compile_definitions(DiffuseSynth
 
 juce_add_binary_data(DiffuseSynthBinaryData
         SOURCES
-        Resources/lng/english.json
-        Resources/lng/german.json
         Resources/magic.xml)
 
 target_link_libraries(DiffuseSynth
