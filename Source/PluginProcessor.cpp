@@ -62,7 +62,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 ),
           apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
 {
-    FOLEYS_SET_SOURCE_PATH(__FILE__);
+    //FOLEYS_SET_SOURCE_PATH(__FILE__);
     magicState.setGuiValueTree(BinaryData::magic_xml, BinaryData::magic_xmlSize);
 
     magicState.getPropertyAsValue ("prompt").setValue(AudioPluginConstants::initialPromptFieldMessage);
