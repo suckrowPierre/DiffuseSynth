@@ -39,9 +39,9 @@
     </Style>
   </Styles>
   <View id="root" resizable="0" resize-corner="0" flex-direction="column"
-        display="" background-color="FF000000" lookAndFeel="Skeuomorphic"
-        border-color="FFFFFFFF" tab-color="FFFFFFFF" background-gradient=""
-        width="1200" height="750" tooltip-background="">
+        display="" lookAndFeel="Skeuomorphic" background-gradient=""
+        width="1200" height="750" tooltip-background="" background-color=""
+        border-color="" tab-color="">
     <View lookAndFeel="" border-color="FF000000" background-color="FF000000"
           padding="" border="3">
       <View flex-direction="column" flex-align-content="stretch" margin=""
@@ -54,9 +54,9 @@
                margin="0" padding="0" background-color="00000000" border-color="00000000"/>
       </View>
       <View flex-shrink="1" flex-grow="1" background-color="00000000">
-        <Label text="server connected" label-text="FF06FF00" justification="centred-right"
+        <Label text="server connected" label-text="FFFF0000" justification="centred-right"
                id="server_status" background-color="00000000"/>
-        <Label text="model running" label-text="FF06FF00" justification="centred-right"
+        <Label text="model running" label-text="FFFF0000" justification="centred-right"
                max-width="150" id="model_status" background-color="00000000"/>
         <TextButton onClick="refresh" caption="" text="refresh" width="" max-width="150"
                     background-color="00000000" min-height="40" pos-height="" pos-y=""/>
