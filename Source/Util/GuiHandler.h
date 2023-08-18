@@ -8,7 +8,7 @@
 #define DIFFUSESYNTH_GUIHANDLER_H
 
 #include "juce_audio_processors/juce_audio_processors.h"
-#include "../../Modules/foleys_gui_magic/foleys_gui_magic.h"
+#include <foleys_gui_magic/foleys_gui_magic.h>
 #include "GuiHelpers.h"
 
 class AudioPluginAudioProcessor;

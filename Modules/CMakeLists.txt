@@ -1,1 +1,1 @@
-juce_add_modules(foleys_gui_magic)
+add_subdirectory(foleys_gui_magic/modules)

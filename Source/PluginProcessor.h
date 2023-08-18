@@ -1,7 +1,7 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
-#include "../Modules/foleys_gui_magic/foleys_gui_magic.h"
+#include <foleys_gui_magic/foleys_gui_magic.h>
 #include "Util/Constants.h"
 #include "Util/GuiHandler.h"
 #include "Api//ApiHandler.h"
