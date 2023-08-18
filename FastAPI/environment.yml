@@ -1,0 +1,20 @@
+name: DiffuseSynthAPI_env
+channels:
+  - defaults
+dependencies:
+  - python=3.11.0
+  - pip
+  - jupyter
+  - pip:
+      - torch==2.0.1
+      - diffusers
+      - transformers
+      - fastapi
+      - uvicorn
+      - pydantic
+      - accelerate
+      - soundfile
+      - librosa
+      - numpy
+      - matplotlib
+      - librosa

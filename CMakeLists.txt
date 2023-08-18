@@ -92,7 +92,14 @@ juce_add_plugin(DiffuseSynth
 target_sources(DiffuseSynth
     PRIVATE
         Source/PluginProcessor.cpp
-        Source/LocalizationManager.cpp
+        Source/Api/AudioLDMApiClient.cpp
+        Source/Util/Logger.cpp
+        Source/Util/Constants.h
+        Source/Util/GuiHandler.cpp
+        Source/Api/ApiHandler.cpp
+        Source/Util/GuiHelpers.cpp
+        Source/Components/SampleHolder.cpp
+        Source/Components/MySampler.cpp
         Modules/foleys_gui_magic/foleys_gui_magic.cpp
         )
 
@@ -106,7 +113,7 @@ target_sources(DiffuseSynth
 target_compile_definitions(DiffuseSynth
     PUBLIC
         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
-        FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
+        # FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
         JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
         JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
         JUCE_VST3_CAN_REPLACE_VST2=0)
@@ -130,12 +137,13 @@ juce_add_binary_data(DiffuseSynthBinaryData
         SOURCES
         Resources/lng/english.json
         Resources/lng/german.json
-        Resources/magic.xml )
+        Resources/magic.xml)
 
 target_link_libraries(DiffuseSynth
         PRIVATE
         DiffuseSynthBinaryData  # Binary data target
         juce::juce_audio_utils
+        juce::juce_core
         juce::juce_dsp
         juce::juce_cryptography
         PUBLIC
