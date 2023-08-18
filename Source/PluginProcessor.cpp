@@ -82,19 +82,18 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     setupProcessor();
 
     for(int i = 0; i < AudioPluginConstants::numVoices; i++) {
-        sampler.addVoice(new juce::SamplerVoice());
+        sampler.addVoice(new MySamplerVoice());
     }
 
-    addParamListeners();
+    pitch = dynamic_cast<juce::AudioParameterFloat *>(getParameter("PITCH"));
+    gain = dynamic_cast<juce::AudioParameterFloat *>(getParameter("GAIN"));
+    attack = dynamic_cast<juce::AudioParameterFloat *>(getParameter("ATTACK_"));
+    decay = dynamic_cast<juce::AudioParameterFloat *>(getParameter("DECAY_"));
+    sustain = dynamic_cast<juce::AudioParameterFloat *>(getParameter("SUSTAIN_"));
+    release = dynamic_cast<juce::AudioParameterFloat *>(getParameter("RELEASE_"));
 }
 
-void AudioPluginAudioProcessor::addParamListeners() {
-    addParameterListener("ATTACK_");
-    addParameterListener("DECAY_");
-    addParameterListener("SUSTAIN_");
-    addParameterListener("RELEASE_");
-    addParameterListener("PITCH");
-}
+
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
         reader = nullptr;
@@ -109,51 +108,45 @@ void AudioPluginAudioProcessor::addFloatParameter(std::vector<std::unique_ptr<ju
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>(id, name, min, max, defaultVal));
 }
 
-void AudioPluginAudioProcessor::addParameterListener(const std::string& paramId) {
-    auto param = getParameter(paramId);
-    param->addListener(this);
-    ParameterIndexMap[paramId] = param->getParameterIndex();
-}
 
 juce::RangedAudioParameter* AudioPluginAudioProcessor::getParameter(const std::string& paramId) {
-    auto param = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter(paramId));
+    auto param = dynamic_cast<juce::RangedAudioParameter*>(apvts.getParameter(paramId));
     jassert(param);
     return param;
 }
 
-void AudioPluginAudioProcessor::parameterValueChanged (int parameterIndex, float newValue){
-    if(parameterIndex == ParameterIndexMap["ATTACK_"] || parameterIndex == ParameterIndexMap["DECAY_"] || parameterIndex == ParameterIndexMap["SUSTAIN_"] || parameterIndex == ParameterIndexMap["RELEASE_"]) {
-        updateADSRParameters();
-    } else if(parameterIndex == ParameterIndexMap["PITCH"]) {
-
-    }
-}
-
-void AudioPluginAudioProcessor::parameterGestureChanged (int parameterIndex, bool gestureIsStarting){
-}
-
 void AudioPluginAudioProcessor::fetchADSRParameters(){
-    ADSRParameters.attack = apvts.getRawParameterValue("ATTACK_")->load();
-    ADSRParameters.decay = apvts.getRawParameterValue("DECAY_")->load();
-    ADSRParameters.sustain = apvts.getRawParameterValue("SUSTAIN_")->load();
-    ADSRParameters.release = apvts.getRawParameterValue("RELEASE_")->load();
+    ADSRParameters.attack = attack->get();
+    ADSRParameters.decay = decay->get();
+    ADSRParameters.sustain = sustain->get();
+    ADSRParameters.release = release->get();
 }
 
 void AudioPluginAudioProcessor::updateADSRParameters() {
     fetchADSRParameters();
-    std::cout << "Attack: " << ADSRParameters.attack << std::endl;
-    std::cout << "Decay: " << ADSRParameters.decay << std::endl;
-    std::cout << "Sustain: " << ADSRParameters.sustain << std::endl;
-    std::cout << "Release: " << ADSRParameters.release << std::endl;
 
     for(int i = 0; i < sampler.getNumSounds(); i++) {
-        auto* sound = dynamic_cast<juce::SamplerSound*>(sampler.getSound(i).get());
+        auto* sound = dynamic_cast<MySamplerSound*>(sampler.getSound(i).get());
         if(sound) {;
             sound->setEnvelopeParameters(ADSRParameters);
         }
     }
 }
 
+void AudioPluginAudioProcessor::updatePitch()
+{
+
+    float semitoneShift = juce::roundToInt(pitch->get()*100)*0.01f;
+    float pitchShift = std::pow(2.0f, semitoneShift / 12.0f);
+    for (int i = 0; i < sampler.getNumVoices(); ++i)
+    {
+        if (auto* voice = dynamic_cast<MySamplerVoice*>(sampler.getVoice(i)))
+        {
+            voice->setPitch(pitchShift);
+        }
+    }
+
+}
 
 void AudioPluginAudioProcessor::initialiseBuilder (foleys::MagicGUIBuilder& builder)
 {
@@ -192,8 +185,9 @@ void AudioPluginAudioProcessor::loadFile(){
 
             audioThumbnail->setAudioFileAndBuffer(file, &waveForm);
 
-            sampler.addSound(new juce::SamplerSound("sample", *readerPtr, range, 60, 0, 0.1, 10.0));
+            sampler.addSound(new MySamplerSound("sample", *readerPtr, range, 60, 0, 0.1, 10.0));
             updateADSRParameters();
+            updatePitch();
         }
         else
         {
@@ -358,6 +352,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     //magicState.prepareToPlay(sampleRate, samplesPerBlock);
 
     updateADSRParameters();
+    updatePitch();
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -402,10 +397,11 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-
+    updatePitch();
+    updateADSRParameters();
     sampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-    //update gain
-    buffer.applyGain(apvts.getRawParameterValue("GAIN")->load());
+
+    buffer.applyGain(gain->get());
     outputMeter->pushSamples(buffer);
 
 }

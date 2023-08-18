@@ -6,10 +6,10 @@
 #include "Util/GuiHandler.h"
 #include "Api//ApiHandler.h"
 #include "Components/SampleHolder.h"
-#include "Components/SampleHolder.h"
+#include "Components/MySampler.h"
 
 //==============================================================================
-class AudioPluginAudioProcessor  : public foleys::MagicProcessor, public juce::AudioParameterFloat::Listener
+class AudioPluginAudioProcessor  : public foleys::MagicProcessor
 {
 public:
     AudioPluginAudioProcessor();
@@ -19,8 +19,6 @@ public:
     std::unique_ptr<ApiHandler> apiHandler;
     std::unique_ptr<GuiHandler> guiHandler;
 
-    void parameterValueChanged (int parameterIndex, float newValue) override;
-    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
     //==============================================================================
     // AudioProcessor overrides
     //==============================================================================
@@ -68,6 +66,14 @@ private:
     void initModel() const;
     juce::ADSR::Parameters ADSRParameters;
 
+    juce::AudioParameterFloat* pitch  = nullptr;
+    juce::AudioParameterFloat* attack  = nullptr;
+    juce::AudioParameterFloat* decay   = nullptr;
+    juce::AudioParameterFloat* sustain = nullptr;
+    juce::AudioParameterFloat* release = nullptr;
+    juce::AudioParameterFloat* gain    = nullptr;
+
+
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
     juce::AudioProcessorValueTreeState apvts;
@@ -83,10 +89,10 @@ private:
     static void addFloatParameter(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters,
                                   const std::string& id, const std::string& name,
                                   float min, float max, float defaultVal);
-    void addParameterListener(const std::string& paramId);
     juce::RangedAudioParameter* getParameter(const std::string& paramId);
     void updateADSRParameters();
     void fetchADSRParameters();
+    void updatePitch();
 
     static void addChoiceParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters);
     static void addIntParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters);

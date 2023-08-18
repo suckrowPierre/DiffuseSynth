@@ -99,6 +99,7 @@ target_sources(DiffuseSynth
         Source/Api/ApiHandler.cpp
         Source/Util/GuiHelpers.cpp
         Source/Components/SampleHolder.cpp
+        Source/Components/MySampler.cpp
         Modules/foleys_gui_magic/foleys_gui_magic.cpp
         )
 
