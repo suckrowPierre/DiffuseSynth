@@ -13,6 +13,7 @@ DiffuseSynth is a synthesizer that utilizes diffusion techniques to generate pla
 ## Installation
 
 ### VSTs/AUs/Standalone
+! not yet released!
 Download the latest stable release from the [releases page](), and follow the instructions provided for your specific platform.
 
 ### Source
