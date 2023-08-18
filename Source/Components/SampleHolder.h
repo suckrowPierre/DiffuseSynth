@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../../Modules/foleys_gui_magic/foleys_gui_magic.h"
+#include <foleys_gui_magic/foleys_gui_magic.h>
 
 
 

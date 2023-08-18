@@ -40,7 +40,7 @@ endif()
 
 # find_package(JUCE CONFIG REQUIRED)        # If you've installed JUCE to your system
 # or
- add_subdirectory(JUCE JUCE)
+add_subdirectory(JUCE JUCE)
 
 add_subdirectory(Modules)
 
@@ -100,7 +100,6 @@ target_sources(DiffuseSynth
         Source/Util/GuiHelpers.cpp
         Source/Components/SampleHolder.cpp
         Source/Components/MySampler.cpp
-        Modules/foleys_gui_magic/foleys_gui_magic.cpp
         )
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
@@ -146,6 +145,7 @@ target_link_libraries(DiffuseSynth
         juce::juce_core
         juce::juce_dsp
         juce::juce_cryptography
+        foleys::foleys_gui_magic
         PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
