@@ -78,9 +78,7 @@ public:
     MySamplerVoice();
     ~MySamplerVoice() override;
 
-    void setPitch(float pitch) {
-        this->pitchShift = pitch;
-    }
+    void setTuneRatio(float tuneRatio){ this->tuneRatio = tuneRatio; }
     //==============================================================================
     bool canPlaySound (juce::SynthesiserSound*) override;
 
@@ -93,9 +91,10 @@ public:
     void renderNextBlock (juce::AudioBuffer<float>&, int startSample, int numSamples) override;
     using SynthesiserVoice::renderNextBlock;
 private:
-    float pitchShift = 1;
+    float tuneRatio = 1;
     double pitchRatio = 0;
     double basePitchRatio = 0;
+    double pitchWheelRatio = 1;
     double sourceSamplePosition = 0;
     float lgain = 0, rgain = 0;
 

@@ -142,7 +142,7 @@ void AudioPluginAudioProcessor::updatePitch()
     {
         if (auto* voice = dynamic_cast<MySamplerVoice*>(sampler.getVoice(i)))
         {
-            voice->setPitch(pitchShift);
+            voice->setTuneRatio(pitchShift);
         }
     }
 

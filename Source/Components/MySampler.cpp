@@ -50,12 +50,11 @@
 
     void MySamplerVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound *s,
                                    int /*currentPitchWheelPosition*/) {
-        std::cout << "Starting note: " << midiNoteNumber << " with pitch shift: " << pitchShift << std::endl;
         if (auto *sound = dynamic_cast<const MySamplerSound *> (s)) {
             basePitchRatio = std::pow(2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
                              * sound->sourceSampleRate / getSampleRate();
 
-            pitchRatio = basePitchRatio * pitchShift;
+            pitchRatio = basePitchRatio * tuneRatio * pitchWheelRatio;
 
             sourceSamplePosition = 0.0;
             lgain = velocity;
@@ -71,7 +70,6 @@
     }
 
     void MySamplerVoice::stopNote(float /*velocity*/, bool allowTailOff) {
-        std::cout << "Stopping note" << std::endl;
         if (allowTailOff) {
             adsr.noteOff();
         } else {
@@ -80,14 +78,18 @@
         }
     }
 
-    void MySamplerVoice::pitchWheelMoved(int /*newValue*/) {}
+    void MySamplerVoice::pitchWheelMoved(int newValue) {
+        float pitchWheelShift = (newValue - 8192) / 4096.0f * 2.0f;
+        pitchWheelRatio = std::pow(2.0f, pitchWheelShift / 12.0f);
+    }
 
     void MySamplerVoice::controllerMoved(int /*controllerNumber*/, int /*newValue*/) {}
 
 //==============================================================================
     void MySamplerVoice::renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples) {
         if (auto *playingSound = static_cast<MySamplerSound *> (getCurrentlyPlayingSound().get())) {
-            pitchRatio = basePitchRatio * pitchShift;
+            pitchRatio = basePitchRatio * tuneRatio * pitchWheelRatio;
+            std::cout << "pitchRatio: " << pitchRatio << std::endl;
             auto &data = *playingSound->data;
             const float *const inL = data.getReadPointer(0);
             const float *const inR = data.getNumChannels() > 1 ? data.getReadPointer(1) : nullptr;
