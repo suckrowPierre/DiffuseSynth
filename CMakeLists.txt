@@ -60,8 +60,8 @@ set_property(GLOBAL PROPERTY JUCE_COPY_PLUGIN_AFTER_BUILD TRUE)
 
 juce_add_plugin(DiffuseSynth
     # VERSION ...                               # Set this if the plugin version is different to the project version
-    # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
-    # ICON_SMALL ...
+    ICON_BIG "${CMAKE_CURRENT_SOURCE_DIR}/Resources/icon.png"                            # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
+    # ICON_SMALL "${CMAKE_CURRENT_SOURCE_DIR}/Resources/icon.png"                          # and various plugin formats. These are optional.
     # COMPANY_NAME ...                          # Specify the name of the plugin's author
     IS_SYNTH TRUE                       # Is this a synth or an effect?
     NEEDS_MIDI_INPUT TRUE               # Does the plugin need midi input?
@@ -135,6 +135,7 @@ target_compile_definitions(DiffuseSynth
 juce_add_binary_data(DiffuseSynthBinaryData
         SOURCES
         Resources/magic.xml)
+
 
 target_link_libraries(DiffuseSynth
         PRIVATE
