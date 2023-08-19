@@ -1,4 +1,6 @@
 # DiffuseSynth
+<img width="1201" alt="synth" src="https://github.com/suckrowPierre/DiffuseSynth/assets/100494266/395a531e-684a-464e-aa7c-776cb259b68e">
+
 
 DiffuseSynth is a synthesizer that utilizes diffusion techniques to generate playable sounds. It can be integrated into your workflow as a VST, AU, standalone application, or even run from the source.
 
