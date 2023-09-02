@@ -106,4 +106,6 @@ private:
     void addParamListeners();
 
     juce::String validateSeed(const juce::String &seedString);
+
+    void logAndShowException(const std::exception &e) const;
 };

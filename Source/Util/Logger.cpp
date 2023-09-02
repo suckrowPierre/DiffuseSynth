@@ -11,7 +11,7 @@ Logger::~Logger() {
 
 void Logger::logError(const juce::String& message)
 {
-    juce::Logger::writeToLog("Failed to connect to API. " + message);
+    juce::Logger::writeToLog("Error: " + message);
 }
 
 void Logger::logInfo(const juce::String& message)

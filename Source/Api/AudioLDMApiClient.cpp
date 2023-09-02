@@ -19,15 +19,13 @@
  * @return true on success, false otherwise.
  * @throws std::invalid_argument if device or repo_id is empty.
  */
-bool AudioLDMApiClient::setupModel(const SetupModelParameters& params) {
+void AudioLDMApiClient::setupModel(const SetupModelParameters& params) {
     if (params.device.isEmpty() || params.repo_id.isEmpty()) {
         throw std::invalid_argument("Device and repo_id must not be empty");
     }
-
     juce::String body = getSetupBody(params);
     juce::URL url = constructApiUrl(setupEndpointPath);
     juce::var response = sendPostRequest(url, body);
-    return true;
 }
 
 /**
@@ -36,7 +34,7 @@ bool AudioLDMApiClient::setupModel(const SetupModelParameters& params) {
  * @return true on success, false otherwise.
  * @throws std::invalid_argument if the prompt is empty.
  */
-bool AudioLDMApiClient::generateSample(const GenerateSampleParameters& params) {
+void AudioLDMApiClient::generateSample(const GenerateSampleParameters& params) {
     if (params.prompt.isEmpty()) {
         throw std::invalid_argument("Prompt must not be empty");
     }
@@ -46,7 +44,6 @@ bool AudioLDMApiClient::generateSample(const GenerateSampleParameters& params) {
     juce::URL url = constructApiUrl(generateSampleEndpointPath);
     juce::String base64AudioData = extractAudioDataFromResponse(body, url);
     decodeAudio(base64AudioData);
-    return true;
 }
 
 bool AudioLDMApiClient::isApiAvailable() const{
@@ -57,17 +54,6 @@ bool AudioLDMApiClient::isApiAvailable() const{
         return false;
     }
     return true;
-}
-
-juce::var AudioLDMApiClient::getCurrentParameters() const{
-    juce::URL url = constructApiUrl(currentParametersEndpointPath);
-    juce::var response = sendGetRequest(url);
-
-    if (!response.isObject()){
-        throw std::runtime_error("Response is not a JSON object");
-    }
-
-    return response;
 }
 
 bool AudioLDMApiClient::isModelSetUp() const {

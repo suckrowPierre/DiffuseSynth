@@ -28,13 +28,13 @@ private:
     AudioPluginAudioProcessor& processor;
     std::unique_ptr<AudioLDMApiClient> apiClient;
 
-    void autoStartServer();
-    void autoInitModel();
+    void autoStartServer() {}
+    void autoInitModel() {}
 
     bool checkApiStatus();
     bool checkModelStatus();
-    void getCurrentParams();
     [[nodiscard]] bool isApiClientInitialized() const;
+    [[nodiscard]] void checkApiClientInitialized() const;
 };
 
 

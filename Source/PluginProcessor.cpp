@@ -187,11 +187,13 @@ void AudioPluginAudioProcessor::loadFile(){
         else
         {
             Logger::logError("Unable to create reader for file");
+            throw std::runtime_error("Unable to create reader for file");
         }
     }
     else
     {
         Logger::logError("File does not exist");
+        throw std::runtime_error("File does not exist");
     }
 }
 
@@ -199,7 +201,11 @@ void AudioPluginAudioProcessor::setupProcessor()
 {
     setReferenceValues();
     registerEventTriggers();
-    apiHandler->initializeApiConnection(isAutoStartServer(), isAutoModelSetup() );
+    try {
+        apiHandler->initializeApiConnection(isAutoStartServer(), isAutoModelSetup() );
+    } catch (const std::exception& e) {
+        logAndShowException(e);
+    }
 }
 
 void AudioPluginAudioProcessor::registerEventTriggers()
@@ -260,7 +266,11 @@ int AudioPluginAudioProcessor::getPort() const {
 
 void AudioPluginAudioProcessor::initModel() const {
     Logger::logInfo("(RE)-Initializing model");
-    apiHandler->initModel(getDeviceProperty(), getModelProperty());
+    try {
+        apiHandler->initModel(getDeviceProperty(), getModelProperty());
+    } catch (const std::exception& e) {
+        logAndShowException(e);
+    }
 }
 
 
@@ -277,8 +287,15 @@ void:: AudioPluginAudioProcessor::generateSampleFromPrompt() {
         std::cout << "test" << std::endl;
         loadFile();
     } catch (const std::exception& e) {
-        Logger::logException(e);
+        logAndShowException(e);
     }
+}
+
+void ::AudioPluginAudioProcessor::logAndShowException(const std::exception &e) const {
+    Logger::logException(e);
+    juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                           "Error",
+                                           e.what());
 }
 
 juce::String AudioPluginAudioProcessor::validateSeed(const juce::String &seedString) {
@@ -288,7 +305,7 @@ juce::String AudioPluginAudioProcessor::validateSeed(const juce::String &seedStr
             seed = std::stoul(seedString.toStdString(), nullptr, 0);
         }
         catch (const std::exception &e) {
-            magicState.getPropertyAsValue("seed").setValue("invalid seed");
+            magicState.getPropertyAsValue("seed").setValue("");
             throw std::invalid_argument("Invalid seed");
         }
         return juce::String(seed);
