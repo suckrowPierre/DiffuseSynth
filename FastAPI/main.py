@@ -14,6 +14,7 @@ import librosa.display
 
 app = FastAPI()
 pipe = None
+samplerate = 16000
 
 class Models(Enum):
     # S = "audioldm-s-full"
@@ -59,10 +60,7 @@ class GenerateParams(BaseModel):
     audio_length_in_s: float
     num_inference_steps: int
     guidance_scale: float
-    # simulate_high_end: float
-    # convert_to_44khz: bool
-    # center_low_end: bool
-    sample_rate: int
+    seed: int
 
 
 class SetupParams(BaseModel):
@@ -86,6 +84,16 @@ class AudioModel:
         return pipe
 
     def generate(self, params: GenerateParams):
+        if params.seed != "":
+            generator = torch.Generator(self.device).manual_seed(params.seed)
+            return self.pipe(prompt=params.prompt,
+                             audio_length_in_s=params.audio_length_in_s,
+                             num_inference_steps=params.num_inference_steps,
+                             guidance_scale=params.guidance_scale,
+                             negative_prompt=params.negative_prompt,
+                             generator=generator
+                             ).audios[0]
+
         return self.pipe(prompt=params.prompt,
                          audio_length_in_s=params.audio_length_in_s,
                          num_inference_steps=params.num_inference_steps,
@@ -103,14 +111,6 @@ async def root():
     }
 
 
-@app.get("/init-all-models-once")
-async def init_all_models_once():
-    for model in Models:
-        model_id = "cvssp/" + model.value
-        AudioLDMPipeline.from_pretrained(model_id, torch_dtype=torch.float32)
-    return {
-        "allModelsDownloaded": "true"
-    }
 
 @app.get("/model-status")
 async def get_model_status():
@@ -150,11 +150,11 @@ async def generate(params: GenerateParams):
     if audio_model is None:
         raise HTTPException(status_code=400, detail="Model is not set up. Please POST to /setup first.")
     audio = audio_model.generate(params)
-    plot_melspectrogram(audio, 16000)
+    plot_melspectrogram(audio, samplerate)
 
     with io.BytesIO() as audio_io:
-        sf.write("output.wav", audio, samplerate=params.sample_rate, format='WAV')
-        sf.write(audio_io, audio, samplerate=params.sample_rate, format='WAV')
+        sf.write("output.wav", audio, samplerate, format='WAV')
+        sf.write(audio_io, audio, samplerate, format='WAV')
         audio_bytes = audio_io.getvalue()
 
 

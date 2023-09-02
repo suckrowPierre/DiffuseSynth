@@ -2,6 +2,8 @@
 #include "BinaryData.h"
 #include "Util/GuiHandler.h"
 #include "Util/Logger.h"
+#include <string>
+
 
 void AudioPluginAudioProcessor::addChoiceParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
     parameters.push_back(std::make_unique<juce::AudioParameterChoice>("DEVICES", "Devices", AudioPluginConstants::devices, 0));
@@ -11,8 +13,6 @@ void AudioPluginAudioProcessor::addChoiceParameters(std::vector<std::unique_ptr<
 void AudioPluginAudioProcessor::addIntParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
     parameters.push_back(std::make_unique<juce::AudioParameterInt>("PORT", "Port", 0, 65535, 8000));
     parameters.push_back(std::make_unique<juce::AudioParameterInt>("NUM_INFERENCE_STEPS", "Number of Inference Steps", 5, 20, AudioPluginConstants::initialNumInference));
-    parameters.push_back(std::make_unique<juce::AudioParameterInt>("SAMPLE_RATE", "Sample Rate", AudioPluginConstants::minSampleRate,
-                      AudioPluginConstants::maxSampleRate, AudioPluginConstants::defaultSampleRate));
 }
 
 void AudioPluginAudioProcessor::addBoolParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
@@ -33,10 +33,6 @@ void AudioPluginAudioProcessor::addFloatParameters(std::vector<std::unique_ptr<j
     addFloatParameter(parameters, "RELEASE_", "Release", AudioPluginConstants::minRelease,
                       AudioPluginConstants::maxRelease, AudioPluginConstants::defaultRelease);
     addFloatParameter(parameters, "GAIN", "Gain", AudioPluginConstants::minGain, AudioPluginConstants::maxGain, 0.7f);
-    addFloatParameter(parameters, "STEREO_WIDTH", "Stereo Width", AudioPluginConstants::minStereoWidth,
-                      AudioPluginConstants::maxStereoWidth, AudioPluginConstants::defaultStereoWidth);
-    addFloatParameter(parameters, "SIMULATE_HIGHEND" , "Simulate Highend", AudioPluginConstants::minSimulateHighEnd,
-                      AudioPluginConstants::maxSimulateHighEnd, AudioPluginConstants::defaultSimulateHighEnd);
 
 }
 
@@ -67,10 +63,9 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 
     magicState.getPropertyAsValue ("prompt").setValue(AudioPluginConstants::initialPromptFieldMessage);
     magicState.getPropertyAsValue ("negative_prompt").setValue(AudioPluginConstants::initialNegativePromptFieldMessage);
+    magicState.getPropertyAsValue ("seed").setValue("");
     magicState.getPropertyAsValue ("auto_setup").setValue( AudioPluginConstants::initialAutoModelSetup);
     magicState.getPropertyAsValue ("auto_start").setValue(AudioPluginConstants::initialAutoStartServer);
-    magicState.getPropertyAsValue ("convertTo44kHz").setValue(AudioPluginConstants::initialConvertTo44kHz);
-    magicState.getPropertyAsValue ("centerLowEnd").setValue(AudioPluginConstants::initialCenterLowEnd);
 
 
 
@@ -220,6 +215,7 @@ void AudioPluginAudioProcessor::setReferenceValues()
 {
     promptValue.referTo(magicState.getPropertyAsValue("prompt"));
     negativePromptValue.referTo(magicState.getPropertyAsValue("negative_prompt"));
+    seedValue.referTo(magicState.getPropertyAsValue("seed"));
 }
 
 void AudioPluginAudioProcessor::refresh() const
@@ -269,15 +265,35 @@ void AudioPluginAudioProcessor::initModel() const {
 
 
 void:: AudioPluginAudioProcessor::generateSampleFromPrompt() {
-    apiHandler->generateSample(
-            magicState.getPropertyAsValue("prompt").toString(),
-            magicState.getPropertyAsValue("negative_prompt").toString(),
-            apvts.getParameter("AUDIO_LENGTH")->getCurrentValueAsText().getFloatValue(),
-            apvts.getParameter("NUM_INFERENCE_STEPS")->getCurrentValueAsText().getIntValue(),
-            apvts.getParameter("GUIDANCE_SCALE")->getCurrentValueAsText().getFloatValue(),
-            apvts.getParameter("SAMPLE_RATE")->getCurrentValueAsText().getIntValue()
-            );
-    loadFile();
+    try {
+        apiHandler->generateSample(
+                magicState.getPropertyAsValue("prompt").toString(),
+                magicState.getPropertyAsValue("negative_prompt").toString(),
+                apvts.getParameter("AUDIO_LENGTH")->getCurrentValueAsText().getFloatValue(),
+                apvts.getParameter("NUM_INFERENCE_STEPS")->getCurrentValueAsText().getIntValue(),
+                apvts.getParameter("GUIDANCE_SCALE")->getCurrentValueAsText().getFloatValue(),
+                validateSeed(magicState.getPropertyAsValue("seed").toString())
+        );
+        std::cout << "test" << std::endl;
+        loadFile();
+    } catch (const std::exception& e) {
+        Logger::logException(e);
+    }
+}
+
+juce::String AudioPluginAudioProcessor::validateSeed(const juce::String &seedString) {
+    if(seedString != ""){
+        unsigned long int seed;
+        try {
+            seed = std::stoul(seedString.toStdString(), nullptr, 0);
+        }
+        catch (const std::exception &e) {
+            magicState.getPropertyAsValue("seed").setValue("invalid seed");
+            throw std::invalid_argument("Invalid seed");
+        }
+        return juce::String(seed);
+    }
+    return "";
 }
 
 const juce::String AudioPluginAudioProcessor::getName() const

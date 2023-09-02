@@ -65,12 +65,9 @@
     <View caption-placement="top-left" caption="" title="" tab-caption="Synth"
           id="Synth" background-color="FF000000" lookAndFeel="" flex-direction="column"
           flex-grow="9">
-      <View border-color="00880202" background-color="FF9B9591">
+      <View background-color="FF9B9591" border-color="">
         <View flex-direction="column" flex-grow="8" background-color="00000000"
               padding="0" margin="0">
-          <Label text="AudioLDM Params" font-size="20" justification="centred"
-                 pos-x="" pos-y="" pos-width="" pos-height="" max-height="40"
-                 margin="0" padding="0" background-color="00000000"/>
           <View flex-direction="row" flex-grow="1.0" margin="0" padding="10"
                 background-color="00000000" min-height="0.0">
             <Label caption="prompt" class="LDMparams" text="" editable="1" padding=""
@@ -80,13 +77,16 @@
             <Label caption="negative_prompt" class="LDMparams" editable="1" padding=""
                    margin="" font-size="15" justification="centred" value="negative_prompt"/>
           </View>
+          <Label text="AudioLDM Params" font-size="20" justification="centred"
+                 pos-x="" pos-y="" pos-width="" pos-height="" max-height="40"
+                 margin="0" padding="0" background-color="00000000"/>
           <View flex-direction="row" margin="0" padding="4" background-color="00000000">
             <Slider class="LDMparams" caption="audio_length_in_s" parameter="AUDIO_LENGTH"
                     caption-placement="" slider-textbox=""/>
             <Slider class="LDMparams" caption="num_inference_steps" parameter="NUM_INFERENCE_STEPS"/>
             <Slider class="LDMparams" caption="guidance_scale" parameter="GUIDANCE_SCALE"/>
-            <Slider class="LDMparams" caption="pipeline_sample_rate" parameter="SAMPLE_RATE"
-                    accessibility="0" help-text="" title=""/>
+            <Label height="70" caption="seed" editable="1" justification="centred"
+                   value="seed"/>
           </View>
         </View>
         <View display="contents" margin="0" flex-grow="1" background-color="00000000">

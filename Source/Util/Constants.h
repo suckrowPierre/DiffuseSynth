@@ -38,17 +38,4 @@ namespace AudioPluginConstants
     const float minGain = 0.0f;
     const float maxGain = 1.5f;
 
-    const float minStereoWidth = 0.0f;
-    const float maxStereoWidth = 1.0f;
-    const float defaultStereoWidth = 0.0f;
-    const float minSimulateHighEnd = 0.0f;
-    const float maxSimulateHighEnd = 1.0f;
-    const float defaultSimulateHighEnd = 0.0f;
-
-    const bool initialConvertTo44kHz = false;
-    const bool initialCenterLowEnd = false;
-
-    const int minSampleRate = 4000;
-    const int maxSampleRate = 48000;
-    const int defaultSampleRate = 16000;
 }
