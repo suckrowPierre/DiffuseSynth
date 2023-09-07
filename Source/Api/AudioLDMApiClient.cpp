@@ -205,15 +205,22 @@ juce::String AudioLDMApiClient::getSetupBody(const SetupModelParameters& params)
  * @return The request body as a JSON string.
  */
 juce::String AudioLDMApiClient::getGenerateSampleBody(const GenerateSampleParameters& params) {
-    if (params.seed == "") {
-        juce::String body = R"({ "prompt": ")" + params.prompt + R"(", "negative_prompt": ")" + params.negative_prompt + R"(", "audio_length_in_s": ")" + std::to_string(params.audio_length_in_s) + R"(", "num_inference_steps": ")" + std::to_string(params.num_inference_steps) + R"(", "guidance_scale": ")" + std::to_string(params.guidance_scale) + "\" }";
-        return body;
+    juce::String body = R"({ "prompt": ")" + params.prompt
+                        + R"(", "negative_prompt": ")" + params.negative_prompt
+                        + R"(", "audio_length_in_s": ")" + std::to_string(params.audio_length_in_s)
+                        + R"(", "num_inference_steps": ")" + std::to_string(params.num_inference_steps)
+                        + R"(", "guidance_scale": ")" + std::to_string(params.guidance_scale);
 
-    } else {
-        juce::String body = R"({ "prompt": ")" + params.prompt + R"(", "negative_prompt": ")" + params.negative_prompt + R"(", "audio_length_in_s": ")" + std::to_string(params.audio_length_in_s) + R"(", "num_inference_steps": ")" + std::to_string(params.num_inference_steps) + R"(", "guidance_scale": ")" + std::to_string(params.guidance_scale)  + R"(", "seed": ")" + params.seed + "\" }";
-        return body;
+    // Append the seed field if present
+    if (params.seed != "") {
+        body += R"(", "seed": ")" + params.seed ;
     }
+
+    body += "\" }";
+
+    return body;
 }
+
 
 juce::String AudioLDMApiClient::getApiPort() const {
     if (apiPort.isEmpty()) {

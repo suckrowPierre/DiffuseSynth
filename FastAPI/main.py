@@ -103,8 +103,8 @@ class AudioModel:
                              negative_prompt=params.negative_prompt,
                              generator=generator
                              ).audios[0]
-        print("here")
-        return self.pipe(prompt=params.prompt,
+        else:
+            return self.pipe(prompt=params.prompt,
                          audio_length_in_s=params.audio_length_in_s,
                          num_inference_steps=params.num_inference_steps,
                          guidance_scale=params.guidance_scale,
