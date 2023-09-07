@@ -284,7 +284,6 @@ void:: AudioPluginAudioProcessor::generateSampleFromPrompt() {
                 apvts.getParameter("GUIDANCE_SCALE")->getCurrentValueAsText().getFloatValue(),
                 validateSeed(magicState.getPropertyAsValue("seed").toString())
         );
-        std::cout << "test" << std::endl;
         loadFile();
     } catch (const std::exception& e) {
         logAndShowException(e);

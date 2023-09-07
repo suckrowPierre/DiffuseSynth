@@ -7,7 +7,7 @@ dependencies:
   - jupyter
   - pip:
       - torch==2.0.1
-      - diffusers
+      - git+https://github.com/huggingface/diffusers.git
       - transformers
       - fastapi
       - uvicorn
