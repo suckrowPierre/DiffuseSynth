@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from diffusers import AudioLDMPipeline
+from diffusers import AudioLDM2Pipeline
 from pydantic import BaseModel
 import torch
 import base64
@@ -10,16 +11,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
+from typing import Optional
 
 
 app = FastAPI()
 pipe = None
+samplerate = 16000
 
 class Models(Enum):
     # S = "audioldm-s-full"
-    SV2 = "audioldm-s-full-v2"
-    M = "audioldm-m-full"
-    L = "audioldm-l-full"
+    ALDM_SV2 = "audioldm-s-full-v2"
+    ALDM_M = "audioldm-m-full"
+    ALDM_L = "audioldm-l-full"
+    ALDM_2 = "audioldm2"
+    ALDM_2_L = "audioldm2-large"
+    ALDM_2_MUSIC = "audioldm2-music"
 
 
 class Devices(Enum):
@@ -59,10 +65,7 @@ class GenerateParams(BaseModel):
     audio_length_in_s: float
     num_inference_steps: int
     guidance_scale: float
-    # simulate_high_end: float
-    # convert_to_44khz: bool
-    # center_low_end: bool
-    sample_rate: int
+    seed: Optional[int] = None
 
 
 class SetupParams(BaseModel):
@@ -79,14 +82,29 @@ class AudioModel:
         self.pipe = self.setup_pipe()
 
     def setup_pipe(self):
-        pipe = AudioLDMPipeline.from_pretrained(self.repo_id, torch_dtype=self.dtype)
+        if self.repo_id == "cvssp/audioldm2" or self.repo_id == "cvssp/audioldm2-large" or self.repo_id == "cvssp/audioldm2-music":
+            pipe = AudioLDM2Pipeline.from_pretrained(self.repo_id, torch_dtype=self.dtype)
+        else:
+            pipe = AudioLDMPipeline.from_pretrained(self.repo_id, torch_dtype=self.dtype)
+
         pipe = pipe.to(self.device)
         if self.device == "mps":
             pipe.enable_attention_slicing()
         return pipe
 
     def generate(self, params: GenerateParams):
-        return self.pipe(prompt=params.prompt,
+        print("here2")
+        if params.seed is not None:
+            generator = torch.Generator(self.device).manual_seed(params.seed)
+            return self.pipe(prompt=params.prompt,
+                             audio_length_in_s=params.audio_length_in_s,
+                             num_inference_steps=params.num_inference_steps,
+                             guidance_scale=params.guidance_scale,
+                             negative_prompt=params.negative_prompt,
+                             generator=generator
+                             ).audios[0]
+        else:
+            return self.pipe(prompt=params.prompt,
                          audio_length_in_s=params.audio_length_in_s,
                          num_inference_steps=params.num_inference_steps,
                          guidance_scale=params.guidance_scale,
@@ -103,14 +121,6 @@ async def root():
     }
 
 
-@app.get("/init-all-models-once")
-async def init_all_models_once():
-    for model in Models:
-        model_id = "cvssp/" + model.value
-        AudioLDMPipeline.from_pretrained(model_id, torch_dtype=torch.float32)
-    return {
-        "allModelsDownloaded": "true"
-    }
 
 @app.get("/model-status")
 async def get_model_status():
@@ -146,15 +156,16 @@ async def get_current_model_and_device():
 
 @app.post("/generate")
 async def generate(params: GenerateParams):
+    print("here0")
     global audio_model
     if audio_model is None:
         raise HTTPException(status_code=400, detail="Model is not set up. Please POST to /setup first.")
     audio = audio_model.generate(params)
-    plot_melspectrogram(audio, 16000)
+    plot_melspectrogram(audio, samplerate)
 
     with io.BytesIO() as audio_io:
-        sf.write("output.wav", audio, samplerate=params.sample_rate, format='WAV')
-        sf.write(audio_io, audio, samplerate=params.sample_rate, format='WAV')
+        sf.write("output.wav", audio, samplerate, format='WAV')
+        sf.write(audio_io, audio, samplerate, format='WAV')
         audio_bytes = audio_io.getvalue()
 
 

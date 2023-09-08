@@ -25,7 +25,7 @@ public:
     float audio_length_in_s;
     int num_inference_steps;
     float guidance_scale;
-    int sample_rate;
+    juce::String seed;
 };
 
 class AudioLDMApiClient {
@@ -55,7 +55,7 @@ public:
      * @return true on success, false otherwise.
      * @throws std::invalid_argument if device or repo_id is empty.
      */
-    bool setupModel(const SetupModelParameters& params);
+    void setupModel(const SetupModelParameters& params);
 
     /**
      * @brief Generates a sample with the specified parameters.
@@ -64,7 +64,7 @@ public:
      * @return true on success, false otherwise.
      * @throws std::invalid_argument if the prompt is empty.
      */
-    bool generateSample(const GenerateSampleParameters& params);
+    void generateSample(const GenerateSampleParameters& params);
 
     /**
      * @brief Sets the port to be used in API calls.
@@ -79,13 +79,6 @@ public:
      * @return true if the API is available, false otherwise.
      */
     bool isApiAvailable() const;
-
-    /**
-     * @brief Gets the current device and model.
-     *
-     * @return The current device and model.
-     */
-    juce::var getCurrentParameters() const;
 
     /**
      * @brief Checks is the model is set up.

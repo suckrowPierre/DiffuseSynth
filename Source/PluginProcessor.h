@@ -8,6 +8,7 @@
 #include "Components/SampleHolder.h"
 #include "Components/MySampler.h"
 
+
 //==============================================================================
 class AudioPluginAudioProcessor  : public foleys::MagicProcessor
 {
@@ -86,6 +87,7 @@ private:
     foleys::MagicLevelSource* outputMeter = nullptr;
     juce::Value promptValue{AudioPluginConstants::initialPromptFieldMessage};
     juce::Value negativePromptValue{AudioPluginConstants::initialNegativePromptFieldMessage};
+    juce::Value seedValue{""};
     static void addFloatParameter(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters,
                                   const std::string& id, const std::string& name,
                                   float min, float max, float defaultVal);
@@ -102,4 +104,8 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 
     void addParamListeners();
+
+    juce::String validateSeed(const juce::String &seedString);
+
+    void logAndShowException(const std::exception &e) const;
 };
