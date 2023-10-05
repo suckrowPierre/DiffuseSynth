@@ -11,8 +11,8 @@ void AudioPluginAudioProcessor::addChoiceParameters(std::vector<std::unique_ptr<
 }
 
 void AudioPluginAudioProcessor::addIntParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
-    parameters.push_back(std::make_unique<juce::AudioParameterInt>("PORT", "Port", 0, 65535, 8000));
-    parameters.push_back(std::make_unique<juce::AudioParameterInt>("NUM_INFERENCE_STEPS", "Number of Inference Steps", 5, 20, AudioPluginConstants::initialNumInference));
+    parameters.push_back(std::make_unique<juce::AudioParameterInt>("PORT", "Port", AudioPluginConstants::minPort,AudioPluginConstants::maxPort , AudioPluginConstants::defaultPort));
+    parameters.push_back(std::make_unique<juce::AudioParameterInt>("NUM_INFERENCE_STEPS", "Number of Inference Steps", AudioPluginConstants::minNumInference, AudioPluginConstants::maxNumInference, AudioPluginConstants::initialNumInference));
 }
 
 void AudioPluginAudioProcessor::addBoolParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
@@ -20,10 +20,10 @@ void AudioPluginAudioProcessor::addBoolParameters(std::vector<std::unique_ptr<ju
 }
 
 void AudioPluginAudioProcessor::addFloatParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
-    addFloatParameter(parameters, "AUDIO_LENGTH", "Audio Length", 1.0f, 30.0f, AudioPluginConstants::initialAudioLength);
-    addFloatParameter(parameters, "GUIDANCE_SCALE", "Guidance Scale", 1.0f, 5.0f,
-                      AudioPluginConstants::initialGuidanceScale);
-    addFloatParameter(parameters, "PITCH", "Pitch", AudioPluginConstants::minPitch, AudioPluginConstants::maxPitch, 0);
+    addFloatParameter(parameters, "AUDIO_LENGTH", "Audio Length", AudioPluginConstants::minAudioLength, AudioPluginConstants::maxAudioLength, AudioPluginConstants::defaultAudioLength);
+    addFloatParameter(parameters, "GUIDANCE_SCALE", "Guidance Scale", AudioPluginConstants::minGuidanceScale, AudioPluginConstants::maxGuidanceScale,
+                      AudioPluginConstants::defaultGuidanceScale);
+    addFloatParameter(parameters, "PITCH", "Pitch", AudioPluginConstants::minPitch, AudioPluginConstants::maxPitch, AudioPluginConstants::defaultPitch);
     addFloatParameter(parameters, "ATTACK_", "Attack", AudioPluginConstants::minAttack, AudioPluginConstants::maxAttack,
                       AudioPluginConstants::defaultAttack);
     addFloatParameter(parameters, "DECAY_", "Decay", AudioPluginConstants::minDecay, AudioPluginConstants::maxDecay,
@@ -32,7 +32,7 @@ void AudioPluginAudioProcessor::addFloatParameters(std::vector<std::unique_ptr<j
                       AudioPluginConstants::maxSustain, AudioPluginConstants::defaultSustain);
     addFloatParameter(parameters, "RELEASE_", "Release", AudioPluginConstants::minRelease,
                       AudioPluginConstants::maxRelease, AudioPluginConstants::defaultRelease);
-    addFloatParameter(parameters, "GAIN", "Gain", AudioPluginConstants::minGain, AudioPluginConstants::maxGain, 0.7f);
+    addFloatParameter(parameters, "GAIN", "Gain", AudioPluginConstants::minGain, AudioPluginConstants::maxGain, AudioPluginConstants::defaultGain);
 
 }
 
