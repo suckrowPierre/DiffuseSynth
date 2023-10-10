@@ -93,7 +93,6 @@ class AudioModel:
         return pipe
 
     def generate(self, params: GenerateParams):
-        print("here2")
         if params.seed is not None:
             generator = torch.Generator(self.device).manual_seed(params.seed)
             return self.pipe(prompt=params.prompt,
@@ -156,7 +155,6 @@ async def get_current_model_and_device():
 
 @app.post("/generate")
 async def generate(params: GenerateParams):
-    print("here0")
     global audio_model
     if audio_model is None:
         raise HTTPException(status_code=400, detail="Model is not set up. Please POST to /setup first.")
