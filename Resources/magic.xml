@@ -48,17 +48,17 @@
         <View flex-direction="column" flex-align-content="stretch" margin=""
               padding="" min-width="0.0" flex-align-self="stretch" flex-wrap="nowrap"
               lookAndFeel="" background-color="00000000" border-color="00000000">
-          <Label text="Stable Diffusion Synth" font-size="40" flex-grow="1" min-height="30"
+          <Label text="WaveGenSynth" font-size="40" flex-grow="1" min-height="40"
                  height="30" flex-align-self="stretch" margin="0" padding="0"
                  label-text="FF000000" background-color="" border-color=""/>
-          <Label text="A Synthesizer based on stable diffusion" height="20" min-height="20.0"
+          <Label text="A Synthesizer based on generative AI" height="20" min-height="20.0"
                  margin="0" padding="0" background-color="00000000" border-color="00000000"
                  label-text="FF000000"/>
         </View>
         <View flex-shrink="1" flex-grow="1" background-color="00000000" margin="">
-          <Label text="server connected" label-text="FF06FF00" justification="centred-right"
+          <Label text="server connected" label-text="FFFF0000" justification="centred-right"
                  id="server_status" background-color="00000000"/>
-          <Label text="model running" label-text="FF06FF00" justification="centred-right"
+          <Label text="model running" label-text="FFFF0000" justification="centred-right"
                  max-width="150" id="model_status" background-color="00000000"/>
           <TextButton onClick="refresh" caption="" text="refresh" width="" max-width="150"
                       background-color="00000000" min-height="40" pos-height="" pos-y=""
@@ -68,7 +68,7 @@
     </View>
     <View caption-placement="top-left" caption="" title="" tab-caption="Synth"
           id="Synth" background-color="FFFFFFFF" lookAndFeel="" flex-direction="column"
-          flex-grow="9" margin="0" padding="0" border="10" border-color="FFFFFFFF">
+          flex-grow="8" margin="0" padding="0" border="10" border-color="FFFFFFFF">
       <View background-color="FFF5F5F5" border-color="">
         <View flex-direction="column" flex-grow="8" background-color="00000000"
               padding="0" margin="0">
