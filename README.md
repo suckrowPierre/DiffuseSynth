@@ -1,6 +1,5 @@
 # WaveGenSynth
-<img width="1197" alt="synth" src="https://github.com/suckrowPierre/WaveGenSynth/assets/100494266/91f423f1-36b3-491e-9728-8f9418a1520b">
-
+<img width="1197" alt="synth" src="https://github.com/suckrowPierre/WaveGenSynth/assets/100494266/cd185e80-8fc1-48cf-a2e1-42aea68deaf6">
 
 WaveGenSynth is a synthesizer that utilizes diffusion techniques to generate playable sounds. It can be integrated into your workflow as a VST, AU, standalone application, or even run from the source.
 
@@ -35,7 +34,7 @@ If you prefer to run the source code, follow these steps:
 5. **Set Up the Server** (without the plugin):
    - Update the environment: `conda env update --file environment.yml` (in the FastAPI folder)
    - Activate the environment: `conda activate WaveGenSynthAPI_env`
-   - Start the server: `uvicorn main:app --reload`
+   - Start the server: `uvicorn server:app --reload`
 
 #### Mac
 If you are on a Mac, you will need Xcode for C++ support.
