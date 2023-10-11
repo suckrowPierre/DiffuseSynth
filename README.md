@@ -1,4 +1,4 @@
-# DiffuseSynth
+# WaveGenSynth
 <img width="1201" alt="synth" src="https://github.com/suckrowPierre/DiffuseSynth/assets/100494266/e72ef420-3b86-4d85-b8c1-07029108a94a">
 
 
