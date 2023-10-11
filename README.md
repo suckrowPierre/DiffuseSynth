@@ -46,7 +46,7 @@ Not yet tested
 
 Using DiffuseSynth is straightforward:
 1. Start Server executable and plugin.
-2. Init a model. May take a while and freezes the plugin. ! (Choose cuda as a device if running on hardware with a GPU, mps if running on Apple Silicone, and cpu as a fallback)
+2. Init a model. May take a while and freezes the plugin. Look onto server console until it has finsihed downloading, if initalizing for the first time ! (Choose cuda as a device if running on hardware with a GPU, mps if running on Apple Silicone, and cpu as a fallback)
 3. Write a prompt into the designated field.
 4. Press the "generate" button.
 6. Select the appropriate MIDI input device.
