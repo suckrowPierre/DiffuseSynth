@@ -40,70 +40,83 @@
   </Styles>
   <View id="root" resizable="0" resize-corner="0" flex-direction="column"
         display="" lookAndFeel="Skeuomorphic" background-gradient=""
-        width="1200" height="750" tooltip-background="" background-color=""
-        border-color="" tab-color="">
-    <View lookAndFeel="" border-color="FF000000" background-color="FF000000"
-          padding="" border="3">
-      <View flex-direction="column" flex-align-content="stretch" margin=""
-            padding="" min-width="0.0" flex-align-self="stretch" flex-wrap="nowrap"
-            lookAndFeel="" background-color="00000000" border-color="00000000">
-        <Label text="Stable Diffusion Synth" font-size="40" flex-grow="1" min-height="30"
-               height="30" flex-align-self="stretch" margin="0" padding="0"
-               label-text="FFFFFFFF" background-color="00000000" border-color="00000000"/>
-        <Label text="A Synthesizer based on stable diffusion" height="20" min-height="20.0"
-               margin="0" padding="0" background-color="00000000" border-color="00000000"/>
-      </View>
-      <View flex-shrink="1" flex-grow="1" background-color="00000000">
-        <Label text="server connected" label-text="FFFF0000" justification="centred-right"
-               id="server_status" background-color="00000000"/>
-        <Label text="model running" label-text="FFFF0000" justification="centred-right"
-               max-width="150" id="model_status" background-color="00000000"/>
-        <TextButton onClick="refresh" caption="" text="refresh" width="" max-width="150"
-                    background-color="00000000" min-height="40" pos-height="" pos-y=""/>
+        width="1200" height="750" tooltip-background="" tab-color=""
+        margin="0" padding="0" border="" radius="" border-color="" background-color="">
+    <View lookAndFeel="" background-color="FFFFFFFF" padding="0" margin="0"
+          border="10" border-color="">
+      <View background-color="FFF5F5F5">
+        <View flex-direction="column" flex-align-content="stretch" margin=""
+              padding="" min-width="0.0" flex-align-self="stretch" flex-wrap="nowrap"
+              lookAndFeel="" background-color="00000000" border-color="00000000">
+          <Label text="Stable Diffusion Synth" font-size="40" flex-grow="1" min-height="30"
+                 height="30" flex-align-self="stretch" margin="0" padding="0"
+                 label-text="FF000000" background-color="" border-color=""/>
+          <Label text="A Synthesizer based on stable diffusion" height="20" min-height="20.0"
+                 margin="0" padding="0" background-color="00000000" border-color="00000000"
+                 label-text="FF000000"/>
+        </View>
+        <View flex-shrink="1" flex-grow="1" background-color="00000000" margin="">
+          <Label text="server connected" label-text="FF06FF00" justification="centred-right"
+                 id="server_status" background-color="00000000"/>
+          <Label text="model running" label-text="FF06FF00" justification="centred-right"
+                 max-width="150" id="model_status" background-color="00000000"/>
+          <TextButton onClick="refresh" caption="" text="refresh" width="" max-width="150"
+                      background-color="00000000" min-height="40" pos-height="" pos-y=""
+                      button-color="FF313131"/>
+        </View>
       </View>
     </View>
     <View caption-placement="top-left" caption="" title="" tab-caption="Synth"
-          id="Synth" background-color="FF000000" lookAndFeel="" flex-direction="column"
-          flex-grow="9">
-      <View background-color="FF9B9591" border-color="">
+          id="Synth" background-color="FFFFFFFF" lookAndFeel="" flex-direction="column"
+          flex-grow="9" margin="0" padding="0" border="10" border-color="FFFFFFFF">
+      <View background-color="FFF5F5F5" border-color="">
         <View flex-direction="column" flex-grow="8" background-color="00000000"
               padding="0" margin="0">
           <View flex-direction="row" flex-grow="1.0" margin="0" padding="10"
                 background-color="00000000" min-height="0.0">
             <Label caption="prompt" class="LDMparams" text="" editable="1" padding=""
                    max-height="70" margin="" justification="centred" font-size="15"
-                   value="prompt"/>
+                   background-color="FFE8E8E8" label-text="FF000000" caption-color="FF000000"
+                   label-editing-text="FF000000" value="prompt"/>
             <View border-color="00000000" background-color="00000000" flex-grow="0.1"/>
             <Label caption="negative_prompt" class="LDMparams" editable="1" padding=""
-                   margin="" font-size="15" justification="centred" value="negative_prompt"/>
+                   margin="" font-size="15" justification="centred" background-color="FFE8E8E8"
+                   caption-color="FF000000" label-text="FF000000" label-editing-text="FF000000"
+                   value="negative_prompt"/>
           </View>
           <Label text="AudioLDM Params" font-size="20" justification="centred"
                  pos-x="" pos-y="" pos-width="" pos-height="" max-height="40"
-                 margin="0" padding="0" background-color="00000000"/>
+                 margin="0" padding="0" label-text="FF000000" background-color=""/>
           <View flex-direction="row" margin="0" padding="4" background-color="00000000">
             <Slider class="LDMparams" caption="audio_length_in_s" parameter="AUDIO_LENGTH"
-                    caption-placement="" slider-textbox=""/>
-            <Slider class="LDMparams" caption="num_inference_steps" parameter="NUM_INFERENCE_STEPS"/>
-            <Slider class="LDMparams" caption="guidance_scale" parameter="GUIDANCE_SCALE"/>
-            <Label height="70" caption="seed" editable="1" justification="centred"
-                   value="seed"/>
+                    caption-placement="" slider-textbox="" background-color="FFE8E8E8"
+                    caption-color="FF000000" slider-text="FF000000"/>
+            <Slider class="LDMparams" caption="num_inference_steps" parameter="NUM_INFERENCE_STEPS"
+                    background-color="FFE8E8E8" caption-color="FF000000" slider-text="FF000000"/>
+            <Slider class="LDMparams" caption="guidance_scale" parameter="GUIDANCE_SCALE"
+                    background-color="FFE8E8E8" caption-color="FF000000" slider-text="FF000000"/>
+            <Label class="LDMparams" height="70" caption="seed" editable="1" justification="centred"
+                   background-color="FFE8E8E8" caption-color="FF000000" label-editing-text="FF000000"
+                   label-text="FF000000" value="seed"/>
           </View>
         </View>
         <View display="contents" margin="0" flex-grow="1" background-color="00000000">
           <TextButton onClick="generate" text="generate sample" lookAndFeel="LookAndFeel_V4"
                       flex-grow="1" flex-shrink="1" flex-align-self="center" height=""
                       max-width="" max-height="" pos-x="-5" pos-y="28.2051%" pos-height="100"
-                      background-color="00000000" pos-width="100%"/>
+                      background-color="00000000" pos-width="100%" button-color="FF313131"
+                      button-on-text="" button-off-text=""/>
         </View>
       </View>
-      <View background-color="FF9B9591">
+      <View background-color="FFF5F5F5">
         <View flex-direction="row" flex-grow="5" lookAndFeel="" background-color="00000000">
           <View flex-direction="row" lookAndFeel="" background-color="00000000">
-            <View id="waveform" flex-direction="column">
-              <WaveformDisplay waveform-colour="FFFFFFFF"/>
+            <View id="waveform" flex-direction="column" background-color="FFFFFFFF">
+              <WaveformDisplay waveform-colour="FFB581FB" waveform-background="FFFFFFFF" background-color="FFFFFFFF"
+                               border-color="FFFFFFFF"/>
             </View>
-            <View id="spectrogram" flex-direction="column">
-              <SpectrogramDisplay spectrogram-colour="FFFFFFFF"/>
+            <View id="spectrogram" flex-direction="column" background-color="FFFFFFFF">
+              <SpectrogramDisplay spectrogram-colour="FFB581FB" background-color="FFFFFFFF" spectrogram-background="FFFFFFFF"/>
             </View>
           </View>
           <View padding="0" margin="0" lookAndFeel="" background-color="00000000">
@@ -111,54 +124,65 @@
                   margin="0" padding="0" lookAndFeel="Skeuomorphic">
               <View margin="0" padding="0" lookAndFeel="Skeuomorphic" background-color="00000000">
                 <Slider id="attack_slider" slider-type="rotary" caption-placement="centred-top"
-                        caption="Attack" lookAndFeel="" parameter="ATTACK_"/>
-                <Slider slider-type="rotary" caption="Sustain" lookAndFeel="" parameter="SUSTAIN_"/>
+                        caption="Attack" lookAndFeel="" parameter="ATTACK_" background-color="FFE8E8E8"
+                        caption-color="FF000000" slider-text="FF000000"/>
+                <Slider slider-type="rotary" caption="Sustain" lookAndFeel="" parameter="SUSTAIN_"
+                        caption-color="FF000000" background-color="FFE8E8E8" slider-text="FF000000"/>
               </View>
               <View margin="0" padding="0" lookAndFeel="Skeuomorphic" background-color="00000000">
-                <Slider slider-type="rotary" caption="Decay" lookAndFeel="" parameter="DECAY_"/>
-                <Slider slider-type="rotary" caption="Release" lookAndFeel="" parameter="RELEASE_"/>
+                <Slider slider-type="rotary" caption="Decay" lookAndFeel="" parameter="DECAY_"
+                        slider-text="FF000000" caption-color="FF000000" background-color="FFE8E8E8"/>
+                <Slider slider-type="rotary" caption="Release" lookAndFeel="" parameter="RELEASE_"
+                        slider-text="FF000000" caption-color="FF000000" background-color="FFE8E8E8"/>
               </View>
             </View>
           </View>
         </View>
-        <View flex-direction="column">
-          <View caption="" flex-grow="1.4" margin="0" padding="0">
-            <Meter caption="" source="output" bar-fill-color="FF3E54CD"/>
-            <Slider caption="gain" lookAndFeel="Skeuomorphic" parameter="GAIN"/>
+        <View flex-direction="column" background-color="FFE8E8E8">
+          <View caption="" flex-grow="1.4" margin="0" padding="0" background-color="FFE8E8E8">
+            <Meter caption="" source="output" bar-fill-color="FF3E54CD" background-color="FFE8E8E8"
+                   bar-background-color="FFFFFFFF"/>
+            <Slider caption="gain" lookAndFeel="Skeuomorphic" parameter="GAIN" background-color="FFE8E8E8"
+                    slider-text="FF000000" caption-color="FF000000"/>
           </View>
           <View margin="0" padding="0">
             <Slider slider-type="rotary" slider-textbox="textbox-right" caption="tune"
                     flex-grow="1.5" margin="0" padding="0" lookAndFeel="Skeuomorphic"
-                    parameter="PITCH"/>
+                    parameter="PITCH" slider-text="FF000000" caption-color="FF000000"
+                    background-color="FFE8E8E8"/>
           </View>
         </View>
       </View>
-      <View height="" min-height="" max-height="130" background-color="FF9B9591">
-        <View flex-direction="column">
-          <View margin="0" padding="0" background-color="">
-            <Label text="Model Settings" justification="centred-left" class="SettingsHeader"
-                   min-width="0" min-height="0" flex-grow="0.5" font-size="20"/>
-            <TextButton onClick="initModel" max-width="160" text="(re)-init model" min-height="50"/>
+      <View height="" min-height="" max-height="130" background-color="FFF5F5F5">
+        <View flex-direction="column" background-color="FFE8E8E8">
+          <View margin="0" padding="0" background-color="FFE8E8E8">
+            <Label text="Model Settings" justification="centred-left" min-width="0"
+                   min-height="0" flex-grow="0.5" font-size="20" border-color=""
+                   background-color="FFE8E8E8" label-text="FF000000"/>
+            <TextButton onClick="initModel" max-width="160" text="(re)-init model" min-height="50"
+                        background-color="FFE8E8E8" button-color="FF313131"/>
           </View>
-          <View flex-direction="row" margin="0" padding="0">
+          <View flex-direction="row" margin="0" padding="0" background-color="FFE8E8E8">
             <ComboBox id="model_list" parameter="MODELS" caption="pretrained-model"
-                      caption-placement="centred-left" margin="0"/>
+                      caption-placement="centred-left" margin="0" background-color="FFE8E8E8"
+                      caption-color="FF000000" combo-background="FF313131" combo-menu-background="FF313131"/>
             <ComboBox id="device_list" parameter="DEVICES" caption="device" caption-placement="centred-left"
-                      margin=""/>
+                      margin="" background-color="FFE8E8E8" caption-color="FF000000"
+                      combo-background="FF313131" combo-menu-background="FF313131"/>
           </View>
         </View>
-        <View flex-direction="column">
-          <View margin="0" padding="0">
-            <Label text="Server Settings" justification="centred-left" class="SettingsHeader"
-                   min-width="0" min-height="0" flex-grow="0.5" font-size="20"/>
-            <TextButton onClick="startServer" max-width="160" text="(re)-start server"
-                        min-height="50"/>
+        <View flex-direction="column" background-color="FFE8E8E8" flex-grow="0.5">
+          <View margin="0" padding="0" background-color="FFE8E8E8">
+            <Label text="Server Settings" justification="centred-left" min-width="0"
+                   min-height="0" flex-grow="0.5" font-size="20" background-color="FFE8E8E8"
+                   label-text="FF000000"/>
           </View>
-          <View flex-direction="row" margin="0" padding="0">
-            <View/>
+          <View flex-direction="row" margin="0" padding="0" background-color="FFE8E8E8">
             <Label text="" editable="1" parameter="PORT" caption="port" caption-placement="centred-left"
                    justification="centred" pos-x="50%" pos-y="0%" pos-width="50%"
-                   pos-height="100%"/>
+                   pos-height="100%" background-color="FFE8E8E8" caption-color="FF000000"
+                   label-text="FF000000" label-editing-text="FF000000"/>
+            <View background-color="FFE8E8E8"/>
           </View>
         </View>
       </View>

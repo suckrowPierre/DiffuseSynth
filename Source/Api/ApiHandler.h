@@ -16,12 +16,10 @@ public:
     explicit ApiHandler(AudioPluginAudioProcessor& processor);
     ~ApiHandler() = default;
 
-    void initializeApiConnection(bool autoStartServer, bool autoSetupModel);
+    void initializeApiConnection();
     void generateSample(juce::String prompt, juce::String negative_prompt, float audio_length_in_s, int num_inference_steps, float guidance_scale, juce::String seed);
     void initModel(juce::String device, juce::String repo_id);
     void fetchStatusAndParameters();
-    void startServer(int& port);
-
 
 
 private:

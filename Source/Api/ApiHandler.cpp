@@ -27,26 +27,18 @@ void ApiHandler::checkApiClientInitialized() const {
     }
 }
 
-void ApiHandler::initializeApiConnection(bool autoStartServer, bool autoSetupModel) {
+void ApiHandler::initializeApiConnection() {
     apiClient->setApiPort(juce::String(processor.getPort()));
     checkApiClientInitialized();
     Logger::logInfo("Initializing API connection");
     if (checkApiStatus()) {
         if (!checkModelStatus()) {
-            if (processor.isAutoModelSetup()) {
-                autoInitModel();
-            }
+            juce::Logger::writeToLog("Model not set up");
         } else {
             juce::Logger::writeToLog("Model setup");
         }
     }
     fetchStatusAndParameters();
-}
-
-void ApiHandler::startServer(int &port) {
-    juce::File currentFile(juce::File::getSpecialLocation(juce::File::currentExecutableFile));
-    juce::File binaryDir = currentFile.getParentDirectory();
-    std::cout << "Binary directory: " << binaryDir.getFullPathName() << std::endl;
 }
 
 void ApiHandler::initModel(juce::String device, juce::String repo_id) {

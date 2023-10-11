@@ -7,11 +7,10 @@ import base64
 import io
 import soundfile as sf
 from enum import Enum
-import numpy as np
-import matplotlib.pyplot as plt
-import librosa
-import librosa.display
 from typing import Optional
+import uvicorn
+
+
 
 
 app = FastAPI()
@@ -50,14 +49,6 @@ def is_repo_id_valid(repo_id):
 def is_device_valid(device):
     return device in Devices._value2member_map_
 
-def plot_melspectrogram(waveform, sr, n_fft=2048, hop_length=512, n_mels=128):
-    plt.figure(figsize=(11, 8))
-    S = librosa.feature.melspectrogram(y=waveform, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mels=n_mels)
-    S_DB = librosa.amplitude_to_db(S, ref=np.max)
-    librosa.display.specshow(S_DB, sr=sr, hop_length=hop_length, x_axis='time', y_axis='mel')
-    plt.colorbar(format='%+2.0f dB')
-    plt.tight_layout()
-    plt.savefig('test.png', dpi=300)
 
 class GenerateParams(BaseModel):
     prompt: str
@@ -93,7 +84,6 @@ class AudioModel:
         return pipe
 
     def generate(self, params: GenerateParams):
-        print("here2")
         if params.seed is not None:
             generator = torch.Generator(self.device).manual_seed(params.seed)
             return self.pipe(prompt=params.prompt,
@@ -156,15 +146,12 @@ async def get_current_model_and_device():
 
 @app.post("/generate")
 async def generate(params: GenerateParams):
-    print("here0")
     global audio_model
     if audio_model is None:
         raise HTTPException(status_code=400, detail="Model is not set up. Please POST to /setup first.")
     audio = audio_model.generate(params)
-    plot_melspectrogram(audio, samplerate)
 
     with io.BytesIO() as audio_io:
-        sf.write("output.wav", audio, samplerate, format='WAV')
         sf.write(audio_io, audio, samplerate, format='WAV')
         audio_bytes = audio_io.getvalue()
 
@@ -172,3 +159,6 @@ async def generate(params: GenerateParams):
     audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
 
     return {"audio": audio_base64 , "message": "Audio generated successfull with prompt: " + params.prompt}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

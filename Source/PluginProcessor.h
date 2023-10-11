@@ -50,8 +50,6 @@ public:
     //==============================================================================
     juce::String getModelProperty() const;
     juce::String getDeviceProperty() const;
-    bool isAutoStartServer();
-    bool isAutoModelSetup();
     int getPort() const;
 
     std::map<juce::String, int> ParameterIndexMap;

@@ -62,7 +62,7 @@ juce_add_plugin(DiffuseSynth
     # VERSION ...                               # Set this if the plugin version is different to the project version
     ICON_BIG "${CMAKE_CURRENT_SOURCE_DIR}/Resources/icon.png"                            # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     # ICON_SMALL "${CMAKE_CURRENT_SOURCE_DIR}/Resources/icon.png"                          # and various plugin formats. These are optional.
-    # COMPANY_NAME ...                          # Specify the name of the plugin's author
+    COMPANY_NAME "DiffuseSynth"                          # Specify the name of the plugin's author
     IS_SYNTH TRUE                       # Is this a synth or an effect?
     NEEDS_MIDI_INPUT TRUE               # Does the plugin need midi input?
     # NEEDS_MIDI_OUTPUT TRUE/FALSE              # Does the plugin need midi output?
@@ -112,7 +112,7 @@ target_sources(DiffuseSynth
 target_compile_definitions(DiffuseSynth
     PUBLIC
         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
-        # FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
+        FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
         JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
         JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
         JUCE_VST3_CAN_REPLACE_VST2=0)
