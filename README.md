@@ -1,5 +1,6 @@
 # DiffuseSynth
-<img width="1201" alt="synth" src="https://github.com/suckrowPierre/DiffuseSynth/assets/100494266/395a531e-684a-464e-aa7c-776cb259b68e">
+<img width="1201" alt="synth" src="https://github.com/suckrowPierre/DiffuseSynth/assets/100494266/e72ef420-3b86-4d85-b8c1-07029108a94a">
+
 
 
 DiffuseSynth is a synthesizer that utilizes diffusion techniques to generate playable sounds. It can be integrated into your workflow as a VST, AU, standalone application, or even run from the source.
@@ -15,8 +16,9 @@ DiffuseSynth is a synthesizer that utilizes diffusion techniques to generate pla
 ## Installation
 
 ### VSTs/AUs/Standalone
-! not yet released!
 Download the latest stable release from the [releases page](), and follow the instructions provided for your specific platform.
+
+Installer and Server are availabe for Intel and Silicone Mac
 
 ### Source
 If you prefer to run the source code, follow these steps:
@@ -45,7 +47,7 @@ Not yet tested
 ## Usage
 
 Using DiffuseSynth is straightforward:
-1. Start Server (currently in Plugin start not supported. See run source)
+1. Start Server executable and plugin.
 2. Init a model. May take a while and freezes the plugin. ! (Choose cuda as a device if running on hardware with a GPU, mps if running on Apple Silicone, and cpu as a fallback)
 3. Write a prompt into the designated field.
 4. Press the "generate" button.
