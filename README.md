@@ -1,9 +1,8 @@
 # WaveGenSynth
-<img width="1201" alt="synth" src="https://github.com/suckrowPierre/DiffuseSynth/assets/100494266/e72ef420-3b86-4d85-b8c1-07029108a94a">
+<img width="1197" alt="synth" src="https://github.com/suckrowPierre/WaveGenSynth/assets/100494266/91f423f1-36b3-491e-9728-8f9418a1520b">
 
 
-
-DiffuseSynth is a synthesizer that utilizes diffusion techniques to generate playable sounds. It can be integrated into your workflow as a VST, AU, standalone application, or even run from the source.
+WaveGenSynth is a synthesizer that utilizes diffusion techniques to generate playable sounds. It can be integrated into your workflow as a VST, AU, standalone application, or even run from the source.
 
 ## Table of Contents
 - [Installation](#installation)
@@ -35,7 +34,7 @@ If you prefer to run the source code, follow these steps:
 
 5. **Set Up the Server** (without the plugin):
    - Update the environment: `conda env update --file environment.yml` (in the FastAPI folder)
-   - Activate the environment: `conda activate DiffuseSynthAPI_env`
+   - Activate the environment: `conda activate WaveGenSynthAPI_env`
    - Start the server: `uvicorn main:app --reload`
 
 #### Mac
