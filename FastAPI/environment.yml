@@ -1,4 +1,4 @@
-name: DiffuseSynthAPI_env
+name: WaveGenSynthAPI_env
 channels:
   - defaults
 dependencies:
