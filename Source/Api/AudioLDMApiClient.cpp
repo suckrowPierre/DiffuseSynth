@@ -84,7 +84,7 @@ juce::String AudioLDMApiClient::extractAudioDataFromResponse(const juce::String 
  */
 juce::var AudioLDMApiClient::sendPostRequest(const juce::URL& url, const juce::String& body) {
     juce::WebInputStream stream(url.withPOSTData(body), true);
-    stream.withExtraHeaders("Content-Type: application/json");
+    stream.withConnectionTimeout(AudioPluginConstants::apiTimeoutMS).withExtraHeaders("Content-Type: application/json");
 
     if(!stream.connect(nullptr)) {
         throw std::runtime_error("Failed to connect to API");
@@ -96,7 +96,7 @@ juce::var AudioLDMApiClient::sendPostRequest(const juce::URL& url, const juce::S
 
 juce::var AudioLDMApiClient::sendGetRequest(const juce::URL& url) {
     juce::WebInputStream stream(url, true);
-    stream.withCustomRequestCommand("GET");
+    stream.withConnectionTimeout(AudioPluginConstants::apiTimeoutMS).withCustomRequestCommand("GET");
 
     if(!stream.connect(nullptr)) {
         throw std::runtime_error("Failed to connect to API");

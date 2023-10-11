@@ -2,6 +2,7 @@
 
 #include "juce_core/juce_core.h"
 
+
 namespace AudioPluginConstants
 {
     const juce::String initialPromptFieldMessage = "Prompt me";
@@ -50,5 +51,7 @@ namespace AudioPluginConstants
     const int minNumInference = 5;
     const int maxNumInference = 200;
     const int initialNumInference = 10;
+
+    const int apiTimeoutMS = 1800000; // 30 minutes
 
 }
