@@ -1,6 +1,5 @@
 # WaveGenSynth
-<img width="1197" alt="synth" src="https://github.com/suckrowPierre/WaveGenSynth/assets/100494266/91f423f1-36b3-491e-9728-8f9418a1520b">
-
+<img width="1197" alt="synth" src="https://github.com/suckrowPierre/WaveGenSynth/assets/100494266/cd185e80-8fc1-48cf-a2e1-42aea68deaf6">
 
 WaveGenSynth is a synthesizer that utilizes diffusion techniques to generate playable sounds. It can be integrated into your workflow as a VST, AU, standalone application, or even run from the source.
 
@@ -35,7 +34,7 @@ If you prefer to run the source code, follow these steps:
 5. **Set Up the Server** (without the plugin):
    - Update the environment: `conda env update --file environment.yml` (in the FastAPI folder)
    - Activate the environment: `conda activate WaveGenSynthAPI_env`
-   - Start the server: `uvicorn main:app --reload`
+   - Start the server: `uvicorn server:app --reload`
 
 #### Mac
 If you are on a Mac, you will need Xcode for C++ support.
@@ -47,7 +46,7 @@ Not yet tested
 
 Using DiffuseSynth is straightforward:
 1. Start Server executable and plugin.
-2. Init a model. May take a while and freezes the plugin. ! (Choose cuda as a device if running on hardware with a GPU, mps if running on Apple Silicone, and cpu as a fallback)
+2. Init a model. May take a while and freezes the plugin. Look onto server console until it has finsihed downloading, if initalizing for the first time ! (Choose cuda as a device if running on hardware with a GPU, mps if running on Apple Silicone, and cpu as a fallback)
 3. Write a prompt into the designated field.
 4. Press the "generate" button.
 6. Select the appropriate MIDI input device.
