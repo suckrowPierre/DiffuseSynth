@@ -16,7 +16,6 @@ void AudioPluginAudioProcessor::addIntParameters(std::vector<std::unique_ptr<juc
 }
 
 void AudioPluginAudioProcessor::addBoolParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
-    parameters.push_back(std::make_unique<juce::AudioParameterBool>("AUTO_START_SERVER", "Auto Start Server", AudioPluginConstants::initialAutoStartServer));
 }
 
 void AudioPluginAudioProcessor::addFloatParameters(std::vector<std::unique_ptr<juce::RangedAudioParameter>>& parameters) {
@@ -64,8 +63,6 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     magicState.getPropertyAsValue ("prompt").setValue(AudioPluginConstants::initialPromptFieldMessage);
     magicState.getPropertyAsValue ("negative_prompt").setValue(AudioPluginConstants::initialNegativePromptFieldMessage);
     magicState.getPropertyAsValue ("seed").setValue("");
-    magicState.getPropertyAsValue ("auto_setup").setValue( AudioPluginConstants::initialAutoModelSetup);
-    magicState.getPropertyAsValue ("auto_start").setValue(AudioPluginConstants::initialAutoStartServer);
 
 
 
@@ -202,7 +199,7 @@ void AudioPluginAudioProcessor::setupProcessor()
     setReferenceValues();
     registerEventTriggers();
     try {
-        apiHandler->initializeApiConnection(isAutoStartServer(), isAutoModelSetup() );
+        apiHandler->initializeApiConnection();
     } catch (const std::exception& e) {
         logAndShowException(e);
     }
@@ -212,7 +209,6 @@ void AudioPluginAudioProcessor::registerEventTriggers()
 {
     magicState.addTrigger("generate", [&] { generateSampleFromPrompt(); });
     magicState.addTrigger("refresh", [&] { refresh(); });
-    magicState.addTrigger("startServer", [&] { startServer(); });
     magicState.addTrigger("initModel", [&] { initModel(); });
 
 }
@@ -228,28 +224,6 @@ void AudioPluginAudioProcessor::refresh() const
 {
     Logger::logInfo("Refresh");
     apiHandler->fetchStatusAndParameters();
-}
-
-bool AudioPluginAudioProcessor::isAutoStartServer() {
-    bool val =  magicState.getPropertyAsValue("auto_start").getValue();
-    if(val) return true;
-    return false;
-}
-bool AudioPluginAudioProcessor::isAutoModelSetup() {
-    bool val = magicState.getPropertyAsValue("auto_setup").getValue();
-    if(val) return true;
-    return false;
-}
-
-void AudioPluginAudioProcessor::startServer() {
-    Logger::logInfo("(RE)-Starting server");
-    int port = apvts.getParameter("PORT")->getCurrentValueAsText().getIntValue();
-    bool autoStart = magicState.getPropertyAsValue("auto_start").getValue();
-    std::cout << "AutoStart: " << autoStart << std::endl;
-    std::cout << "Port: " << port << std::endl;
-
-    apiHandler->startServer(port);
-    //TODO
 }
 
 juce::String AudioPluginAudioProcessor::getModelProperty() const {
