@@ -62,6 +62,6 @@ Operating WaveGenSynth is straightforward:
 WaveGenSynth was crafted using the following technologies:
 - **GUI Framework**: [JUCE](https://github.com/juce-framework/JUCE)
 - **GUI Module**: [foleys_gui_magic](https://github.com/ffAudio/foleys_gui_magic/)
-- **Diffusion Model**: [AudioLDM](https://github.com/haoheliu/AudioLDM), integrated via the [pipeline](https://huggingface.co/docs/diffusers/main/en/api/pipelines/audioldm) and [AudioLDM2](https://github.com/haoheliu/AudioLDM2), integratvia via the [pipeline](https://huggingface.co/docs/diffusers/main/en/api/pipelines/audioldm2) from [HuggingFace](https://huggingface.co/)
+- **Diffusion Model**: [AudioLDM](https://github.com/haoheliu/AudioLDM), integrated via the [pipeline](https://huggingface.co/docs/diffusers/main/en/api/pipelines/audioldm) and [AudioLDM2](https://github.com/haoheliu/AudioLDM2), integrated via the [pipeline](https://huggingface.co/docs/diffusers/main/en/api/pipelines/audioldm2) from [HuggingFace](https://huggingface.co/)
 
 A special thank you to the developers of these tools that made WaveGenSynth possible.
