@@ -16,7 +16,9 @@ WaveGenSynth is a synthesizer that utilizes diffusion techniques to generate pla
 ### VSTs/AUs/Standalone
 Download the latest stable release from the [releases page](), and follow the instructions provided for your specific platform.
 
-Installer and Server are availabe for Intel and Silicone Mac
+Installer and Server are availabe for Intel and Silicone Mac. 
+
+Try to run the server and connect with it through the plugin. The executable server file may have unstable performance on Intel Mac. If you cannot use the server executable reliable download the `server.py` and `enviroment.yml` from the FastApi folder and run using Conda with the steps described in 4.
 
 ### Source
 If you prefer to run the source code, follow these steps:
@@ -27,11 +29,11 @@ If you prefer to run the source code, follow these steps:
      - `git submodule init`
      - `git submodule update`
 
-3. **Load the Project**: Open the project via the provided CMake file.
+2. **Load the Project**: Open the project via the provided CMake file.
 
-4. **Configure Run/Debug Settings**: Create a Run/Debug Configuration by choosing one of the executables to run the project.
+3. **Configure Run/Debug Settings**: Create a Run/Debug Configuration by choosing one of the executables to run the project.
 
-5. **Set Up the Server** (without the plugin):
+4. **Set Up the Server**:
    - Update the environment: `conda env update --file environment.yml` (in the FastAPI folder)
    - Activate the environment: `conda activate WaveGenSynthAPI_env`
    - Start the server: `uvicorn server:app --reload`
@@ -46,7 +48,7 @@ Not yet tested
 
 Using DiffuseSynth is straightforward:
 1. Start Server executable and plugin.
-2. Init a model. May take a while and freezes the plugin. Look onto server console until it has finsihed downloading, if initalizing for the first time ! (Choose cuda as a device if running on hardware with a GPU, mps if running on Apple Silicone, and cpu as a fallback)
+2. Init a model. May take a while and freezes the plugin. Look onto server console until it has finsihed downloading and setting up. Time-out from the plugin may occur just hit refresh after it has finished setting up, if initalizing for the first time ! (Choose cuda as a device if running on hardware with a Nvidia GPU, mps if running on Apple Silicone, and cpu as a fallback)
 3. Write a prompt into the designated field.
 4. Press the "generate" button.
 6. Select the appropriate MIDI input device.
