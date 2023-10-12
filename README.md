@@ -14,11 +14,11 @@ WaveGenSynth is a synthesizer that utilizes diffusion techniques to generate pla
 ## Installation
 
 ### VSTs/AUs/Standalone
-Download the latest stable release from the [releases page](), and follow the instructions provided for your specific platform.
+Download the latest stable release from the releases, and follow the instructions provided for your specific platform.
 
 Installer and Server are availabe for Intel and Silicone Mac. 
 
-Try to run the server and connect with it through the plugin. The executable server file may have unstable performance on Intel Mac. If you cannot use the server executable reliable download the `server.py` and `enviroment.yml` from the FastApi folder and run using Conda with the steps described in 4.
+Try to run the server and connect with it through the plugin. The executable server file may have unstable performance on Intel Mac. If you cannot use the server executable reliable or prefer running it as a script download the `server_light.zip` and run using Conda with the steps described in 4.
 
 ### Source
 If you prefer to run the source code, follow these steps:
