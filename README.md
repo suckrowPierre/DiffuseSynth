@@ -5,7 +5,7 @@ WaveGenSynth is a unique synthesizer that leverages diffusion techniques to crea
 
 ## [Text-to-Playable-Sound: synthesizers based on latent diffusion technology](https://github.com/suckrowPierre/BachelorThesis)
 
-In this study, the integration and applicability of generative artificial intelligence in the field of music
+In this work, the integration and applicability of generative artificial intelligence in the field of music
 production was analyzed through the introduction of a digital instrument. Using selected diffusion models,
 users can define sounds through textual descriptions and play and manipulate them with standardized music
 production tools. The diffusion models used were evaluated for their suitability in the given context and
