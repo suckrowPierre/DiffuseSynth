@@ -5,19 +5,7 @@ WaveGenSynth is a unique synthesizer that leverages diffusion techniques to crea
 
 ## [Text-to-Playable-Sound: synthesizers based on latent diffusion technology](https://github.com/suckrowPierre/BachelorThesis)
 
-In this work, the integration and applicability of generative artificial intelligence in the field of music
-production was analyzed through the introduction of a digital instrument. Using selected diffusion models,
-users can define sounds through textual descriptions and play and manipulate them with standardized music
-production tools. The diffusion models used were evaluated for their suitability in the given context and
-modified for integration into a digital instrument. Using certain frameworks, the digital instrument was
-created, resulting in a user interface. This allows users to edit model and instrument-specific parameters. The
-analysis showed that the models used do not always adequately respond to the context of music production,
-resulting in unexpected sound patterns or abstract artifacts. Currently, available text-to-audio models do not
-provide high-quality reproduction of familiar sounds but offer opportunities for experimental applications.
-The implementation of a prototype of the digital instrument allows for such experiments and the exploration
-of innovative sound synthesis methods. However, functions are currently missing to reproduce selected areas
-of the generated sounds or to play them indefinitely. Nevertheless, fascinating and unusual soundscapes can
-already be produced, which could potentially find application in musical compositions.
+In this work, the integration and applicability of generative artificial intelligence in the field of music production was analyzed through the introduction of a digital instrument. Using selected diffusion models, users can define sounds through textual descriptions and play and manipulate them with standardized music production tools. The diffusion models used were evaluated for their suitability in the given context and modified for integration into a digital instrument. Using certain frameworks, the digital instrument was created, resulting in a user interface. This allows users to edit model and instrument-specific parameters. The analysis showed that the models used do not always adequately respond to the context of music production, resulting in unexpected sound patterns or abstract artifacts. Currently, available text-to-audio models do not provide high-quality reproduction of familiar sounds but offer opportunities for experimental applications. The implementation of a prototype of the digital instrument allows for such experiments and the exploration of innovative sound synthesis methods. However, functions are currently missing to reproduce selected areas of the generated sounds or to play them indefinitely. Nevertheless, interesting and unusual soundscapes can already be produced, which could find application in musical compositions.
 
 ## Table of Contents
 - [Installation](#installation)
