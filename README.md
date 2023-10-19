@@ -19,6 +19,8 @@ In this work, the integration and applicability of generative artificial intelli
 
 ## Installation
 
+!!! Installer and Server-Application files are currently unsigned for mac. To open right click and click on open. Double click won't work
+
 ### Binary Installations (VST/AU/Standalone)
 Download the latest stable release from the [releases page](https://github.com/suckrowPierre/WaveGenSynth/releases), and follow the instructions for your specific platform.
 
@@ -59,7 +61,7 @@ Operating WaveGenSynth is straightforward:
 2. Initialize a model. This step may take some time during the first run, causing the plugin to freeze momentarily. Monitor the server console until the download and setup are complete. If a timeout occurs in the plugin, hit refresh after the setup is complete. (Select 'cuda' if running on hardware with a Nvidia GPU, 'mps' if running on Apple Silicon, and 'cpu' as a fallback)
 3. Enter a prompt in the designated field.
 4. Click the "Generate" button.
-5. Select the appropriate MIDI input device.
+5. Select the appropriate MIDI input device. If using as a standalone click option and then select your MIDI device
 6. Enjoy creating and playing sounds!
 
 ## Modelevaluation
