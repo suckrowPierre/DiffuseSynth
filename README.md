@@ -28,6 +28,8 @@ Both Installer and Server are available for Intel and Apple Silicon Macs.
 
 After installation, run the server and connect to it through the plugin. Note that the server executable may exhibit unstable performance on Intel Macs. If you face issues with the server executable or prefer running it as a script, download `server_light.zip` and follow the instructions in step 4 below.
 
+You may need to run `chmod +x SiliconeMacServer` or `chmod +x IntelMacServer` to be able to open the server executables
+
 ### Building from Source
 If you prefer to build from source, follow these steps:
 
