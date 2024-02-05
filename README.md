@@ -1,7 +1,7 @@
 # WaveGenSynth
 <img width="1197" alt="synth" src="https://github.com/suckrowPierre/WaveGenSynth/assets/100494266/cd185e80-8fc1-48cf-a2e1-42aea68deaf6">
 
-WaveGenSynth is a unique synthesizer that leverages diffusion techniques to create playable sounds. It can seamlessly integrate into your musical workflow as a VST, AU, standalone application, or run directly from the source code. The digital instrument is the result of my bachelor thesis [Text-to-Playable-Sound: synthesizers based on latent diffusion technology](https://github.com/suckrowPierre/BachelorThesis).
+WaveGenSynth is a unique synthesizer that leverages diffusion techniques to create playable sounds. It can seamlessly integrate into your musical workflow as a VST, AU, standalone application, or run directly from the source code.
 
 ## [Text-to-Playable-Sound: synthesizers based on latent diffusion technology](https://github.com/suckrowPierre/BachelorThesis)
 
@@ -65,9 +65,6 @@ Operating WaveGenSynth is straightforward:
 4. Click the "Generate" button.
 5. Select the appropriate MIDI input device. If using as a standalone click option and then select your MIDI device
 6. Enjoy creating and playing sounds!
-
-## Modelevaluation
-The effect of different torch-devices, parameters and prompts on the available pre-trained models are displayed [here](https://suckrowpierre.github.io/TtPS.github.io/)
 
 ## Credits
 
