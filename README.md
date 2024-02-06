@@ -1,6 +1,4 @@
 # WaveGenSynth
-<img width="1197" alt="synth" src="https://github.com/suckrowPierre/WaveGenSynth/assets/100494266/cd185e80-8fc1-48cf-a2e1-42aea68deaf6">
-
 WaveGenSynth is a unique synthesizer that leverages diffusion techniques to create playable sounds. It can seamlessly integrate into your musical workflow as a VST, AU, standalone application, or run directly from the source code.
 
 ## [Text-to-Playable-Sound: synthesizers based on latent diffusion technology](https://github.com/suckrowPierre/BachelorThesis)
@@ -22,7 +20,15 @@ In this work, the integration and applicability of generative artificial intelli
 !!! Installer and Server-Application files are currently unsigned for mac. To open right click and click on open. Double click won't work
 
 ### Binary Installations (VST/AU/Standalone)
-Download the latest stable release from the [releases page](https://github.com/suckrowPierre/WaveGenSynth/releases), and follow the instructions for your specific platform.
+Download the latest stable releases and follow the instructions for your specific platform.
+
+[IntelMacServer](https://github.com/suckrowPierre/WaveGenSynth/releases/download/bachelor-thesis/IntelMacServer)
+
+[SiliconeMacServer](https://github.com/suckrowPierre/WaveGenSynth/releases/download/bachelor-thesis/SiliconeMacServer)
+
+[ServerLight](https://github.com/suckrowPierre/WaveGenSynth/releases/download/bachelor-thesis/Server_Ligth.zip)
+
+[Mac Installer](https://github.com/suckrowPierre/WaveGenSynth/releases/download/bachelor-thesis/WaveGenSynthMacInstaller.pkg)
 
 Both Installer and Server are available for Intel and Apple Silicon Macs.
 
